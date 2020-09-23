@@ -754,9 +754,11 @@ def export_storage(instance, timepoints_set, storage_set, results_directory, is_
             storage_totaldischarge.append(format_6f(instance.totaldischarge[t, s]()))
             soc.append(format_6f(instance.soc[t, s].value))
             storage_offer.append(format_6f(instance.sodischarge[t, s].value))
-            max_storage_offer.append(format_6f(instance.DischargeMaxOffer[t, s]))
+            max_storage_offer.append(format_6f(instance.DischargeMaxOffer[t, s].value))
             storage_charge_offer.append(format_6f(instance.socharge[t, s].value))
-            max_storage_charge_offer.append(format_6f(instance.ChargeMaxOffer[t, s]))
+            max_storage_charge_offer.append(
+                format_6f(instance.ChargeMaxOffer[t, s].value)
+            )
             storage_tight_dual.append(format_6f(instance.storagetight_dual[t, s].value))
             storage_max_dual.append(format_6f(instance.socmax_dual[t, s].value))
             storage_min_dual.append(format_6f(instance.socmin_dual[t, s].value))

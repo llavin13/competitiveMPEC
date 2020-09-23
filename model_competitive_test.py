@@ -142,10 +142,10 @@ dispatch_model.HybridStorageIndex = Param(
 
 # storage and time-indexed params
 dispatch_model.ChargeMaxOffer = Param(
-    dispatch_model.TIMEPOINTS, dispatch_model.STORAGE, within=Reals
+    dispatch_model.TIMEPOINTS, dispatch_model.STORAGE, within=Reals, mutable=True
 )
 dispatch_model.DischargeMaxOffer = Param(
-    dispatch_model.TIMEPOINTS, dispatch_model.STORAGE, within=Reals
+    dispatch_model.TIMEPOINTS, dispatch_model.STORAGE, within=Reals, mutable=True
 )
 
 dispatch_model.DischargeOffer = Param(
@@ -815,6 +815,7 @@ dispatch_model.MitigateChargeOfferConstraint = Constraint(
 
 
 def MitigateDischargeOffer(model, t, s):
+    # print(model.DischargeMaxOffer[t, s])
     return model.DischargeMaxOffer[t, s] >= model.sodischarge[t, s]
 
 
