@@ -38,27 +38,19 @@ start_time = time.time()
 cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test919")
 
 ### GENERAL INPUTS ###
-case_folder = "303SS_301NSS_Wind303_MitigateOffer"  # andWind309
+case_folder = "303.301SS_Wind303"  # andWind309
 
 # start from 7/1
-<<<<<<< HEAD
-<<<<<<< HEAD
-start_date = "04-08-2019"  # use this string format
-=======
 start_date = "01-01-2019"  # use this string format
->>>>>>> fad2f55ba8f21ece87af3b89e9d8f5ae82aeb6c9
-=======
-start_date = "06-01-2019"  # use this string format
->>>>>>> 0ae8d84960aaa5e875edea24edc5a6ac16f97058
 end_date = "01-01-2020"  # end date is exclusive
-MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
+MPEC = False  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
 # the second value is how many tmps to subset RT cases into
 EPEC, iters = False, 9  # if EPEC and max iterations if True.
 show_plots = False  # if True show plot of gen by fuel and bus LMPs after each case
-mitigate_storage_offers = True
+mitigate_storage_offers = False
 bind_DA_offers_in_RT = False  # if True **AND** RT==True, RT offers are equivalent to DA even for strategic storage
-RTVRE = True  # if True **AND** RT==False, run DA case with real-time VRE data; if True **AND** RT==True, run RT case with RTVRE SOC bind
+RTVRE = False  # if True **AND** RT==False, run DA case with real-time VRE data; if True **AND** RT==True, run RT case with RTVRE SOC bind
 
 ### OPTIONAL SOLVER INPUTS ###
 executable_path = ""  # if you wish to specify cplex.exe path
