@@ -11,7 +11,11 @@ library(dplyr)
 library(table1)
 library(xtable)
 
+<<<<<<< HEAD
 baseWD <- "C:/Users/llavi/Desktop/test919"
+=======
+baseWD <- "C:/Users/llavin/Desktop/test919"
+>>>>>>> b05fcea3f909dbe4cdb34be16d10f111b9e71c63
 setwd(paste(baseWD, "", sep="/"))
 
 ## Load model results ####
@@ -533,6 +537,8 @@ compareStorageHeatplot <- function(storagedflist,plotTitle='NA',type='NA'){
 
 
 compareStorageProfit <- function(storagedflist,plotTitle='hi',resolution=NA){
+  
+  
   ss <- results1$storageresources$Storage_Index[results1$storageresources$StorageIndex == 1]
   #eventually probably a list of dfs as input
   for (i in 1:length(storagedflist)){
@@ -704,6 +710,7 @@ compareObjectives <- function(resultslist){
   
 }
 
+<<<<<<< HEAD
 dates1 <- seq(as.POSIXct("9/1/2019", format = "%m/%d/%Y"), by="day", length.out=10) # Configure cases period here
 dates2 <- seq(as.POSIXct("2/1/2019", format = "%m/%d/%Y"), by="day", length.out=4)
 
@@ -719,11 +726,40 @@ results2 <- loadResults(dates1,folder='303.301SS_Wind303_MitigateOffer',subfolde
 #df2 <- compareObjectives(caselist)
 #df2$delta <- df2$SSProfit-df2$Objective
 #write.csv(df2,"df2.csv")
+=======
+dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=365) # Configure cases period here
+dates2 <- seq(as.POSIXct("6/1/2019", format = "%m/%d/%Y"), by="day", length.out=30)
+
+
+results1 <- loadResults(dates1,folder='303.301NSS_Wind303',subfolder="results_DA_RTVRE")
+results2 <- loadResults(dates1,folder='303.301NSS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
+
+results3 <- loadResults(dates1,folder='303.301SS_Wind303',subfolder="results_DA_RTVRE")
+results4 <- loadResults(dates1,folder='303.301SS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
+
+results5 <- loadResults(dates1,folder='303SS_301NSS_Wind303',subfolder="results_DA_RTVRE")
+results6 <- loadResults(dates1,folder='303SS_301NSS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
+
+results5DA <- loadResults(dates1,folder='303SS_301NSS_Wind303',subfolder="results_DA")
+
+#303.301SS_Wind303_MitigateOffer
+
+#results3 <- loadResults(dates1,folder="303SS_Wind303",subfolder="results_DA_RTVRE")
+#results1RT  <- loadResultsRT(dates1,folder='BothNSS_Wind303')
+
+caselist <- list(results5, results6)
+names(caselist) <- c('day-ahead','mitigate')
+#names(caselist) <- c('NSS',"SS",'mix')
+df4 <- compareObjectives(caselist)
+df2$delta <- df2$SSProfit-df2$Objective
+write.csv(df2,"df2.csv")
+>>>>>>> b05fcea3f909dbe4cdb34be16d10f111b9e71c63
 #results2 <- loadResults(dates2,folder='test')
 # <- loadResultsRT(dates2,folder='test')
 
 #plotDispatch(results2,dates2,plotTitle='Feb',F)
 
+<<<<<<< HEAD
 d1 <- plotDispatch(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
 d2 <- plotPrices(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
 d3 <- plotStorage(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
@@ -739,6 +775,19 @@ d3bind <- plotStorage(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
 #compareplotDispatch(d1,d1RT)
 #compareplotPrices(d2,d2RT)
 #compareplotStorage(d3,d3RT)
+=======
+d1 <- plotDispatch(results3,dates1,plotTitle='SSWind')
+d2 <- plotPrices(results3,dates1,plotTitle='SSWind')
+d3 <- plotStorage(results3,dates1,plotTitle='SSWind')
+
+d1NSS <- plotDispatch(results1,dates1,plotTitle='NSSWind')
+d2NSS <- plotPrices(results1,dates1,plotTitle='NSSWind')
+d3NSS <- plotStorage(results1,dates1,plotTitle='NSSWind')
+
+compareplotDispatch(d1,d1NSS)
+compareplotPrices(d2,d2NSS)
+compareplotStorage(d3,d3NSS)
+>>>>>>> b05fcea3f909dbe4cdb34be16d10f111b9e71c63
 
 caselist <- list(d3,d3bind)
 names(caselist) <- c('day-ahead','real-time')

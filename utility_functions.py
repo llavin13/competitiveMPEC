@@ -174,11 +174,24 @@ class CreateAndRunScenario(object):
                 0,
                 debug_mode=1,
             )
+
         storageclass = StorageOfferMitigation(
             self.dir_str, self.is_RT, mitigation_flag=self.mitigate_storage_offers
         )
-        storageclass.write_SPP_mitigated_offers()
+        offers = storageclass.write_SPP_mitigated_offers()
         print("...storage offer mitigation file created")
+
+        # re-create model?
+        if self.mitigate_storage_offers:
+            overwrite_dict_discharge, overwrite_dict_charge = {}, {}
+            for i, k in enumerate(instance.DischargeMaxOffer.keys()):
+                overwrite_dict_discharge[k] = offers.at[i, "DischargeMaxOffer"]
+                overwrite_dict_charge[k] = offers.at[i, "ChargeMaxOffer"]
+            instance.DischargeMaxOffer.reconstruct(overwrite_dict_discharge)
+            instance.ChargeMaxOffer.reconstruct(overwrite_dict_charge)
+
+            instance.MitigateDischargeOfferConstraint.reconstruct()
+            instance.MitigateChargeOfferConstraint.reconstruct()
 
         if self.is_MPEC:
             print("Converting model to MPEC...")
