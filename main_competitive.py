@@ -38,7 +38,11 @@ start_time = time.time()
 cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test919")
 
 ### GENERAL INPUTS ###
+<<<<<<< HEAD
 case_folder = "303.301NSS_Wind303_MitigateOffer"  # andWind309
+=======
+case_folder = "303SS_301NSS_Wind303_MitigateOffer"  # andWind309
+>>>>>>> 37aa225983595bbe939dfe792864ef13e496d6f0
 
 # start from 7/1
 start_date = "01-01-2019"  # use this string format
