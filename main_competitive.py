@@ -41,7 +41,7 @@ cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test919")
 case_folder = "303SS_301NSS_Wind303_MitigateOffer"  # andWind309
 
 # start from 7/1
-start_date = "01-01-2019"  # use this string format
+start_date = "07-15-2019"  # use this string format
 end_date = "01-01-2020"  # end date is exclusive
 MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
