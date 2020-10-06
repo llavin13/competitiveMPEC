@@ -183,9 +183,10 @@ plotPrices <- function(results,dates,plotTitle,hours=24){
   prices$busID <- substr(prices[,1],start=2,stop=3)
   prices$X <- as.character(prices$X)
   
+  prices <- prices[prices$X %in% c("301"),]
+  print(prices)
   #Luke's plotting code (active)
-  ggplot(data=prices, aes(x=datetime, y=LMP, color=busID)) + geom_line(lwd=1.5) + 
-    facet_wrap(~zone, nrow=1) + 
+  ggplot(data=prices, aes(x=datetime, y=LMP, color=busID)) + geom_line(lwd=1.5) +
     theme_classic() + ylab("$/MWh") + xlab("") +
     scale_x_datetime() +
     guides(colour=guide_legend(title="Bus: ", nrow=5))+
@@ -204,6 +205,12 @@ plotPrices <- function(results,dates,plotTitle,hours=24){
   
   return(prices)
 }
+d2NSS <- plotPrices(results4,dates1,plotTitle='NSSWind')
+d2SS <- plotPrices(results5, dates1, plotTitle="SSWind")
+d2slack <- plotPrices(results5,dates1,plotTitle="slack")
+plist <- list(d2SS,d2NSS,d2slack)
+names(plist) <- c("A","B","C")
+plotAllPrices(plist)
 
 compareplotPrices <- function(prices_df1,prices_df2){
   
@@ -229,6 +236,43 @@ compareplotPrices <- function(prices_df1,prices_df2){
   setwd(paste(baseWD, "post_processing", "figures", sep="/"))
   ggsave(paste0("prices delta",".png"), width=20, height=8)
 }
+
+plotAllPrices <- function(pricelist){
+  
+  for (i in 1:length(pricelist)){
+    pricelist[[i]]$label <- names(pricelist[i]) #may want better label
+  }
+  pricedf <- do.call("rbind", pricelist)
+  plotcolors <- c(A="red",B="black",C="blue")
+  plotlines <- c("solid","solid","solid")
+  labs <- c("STRATEGIC CONGESTED","COMPETITIVE CONGESTED","UNCONGESTED")
+  
+  #Luke's plotting code (active)
+  ggplot(data=pricedf, aes(x=datetime, y=LMP, color=label)) + geom_line(lwd=2.5) + 
+    theme_classic() + ylab("$/MWh") + xlab("") +
+    scale_x_datetime() +
+    scale_color_manual(values = plotcolors, labels=labs) +
+    scale_linetype_manual(values=plotlines) +
+    guides(colour=guide_legend(title="", nrow=1))+
+    theme(legend.text = element_text(size=28),
+          legend.title = element_text(size=30),
+          legend.position = "bottom",
+          plot.title = element_text(size = 40, face = "bold", hjust = 0.5),
+          axis.title.y = element_text(size=40),
+          axis.text.x= element_text(size=32),
+          axis.text.y= element_text(size=32),
+          strip.text.x = element_text(size = 24))
+  
+  setwd(paste(baseWD, "post_processing", "figures", sep="/"))
+  ggsave(paste0("allpricesWIND",".png"), width=20, height=4)
+}
+plist <- list(d2,d2NSS)
+names(plist) <- c("A","B")
+plotAllPrices(plist)
+
+plist <- list(d4SS,d4NSS)
+names(plist) <- c("A","B")
+plotAllPrices(plist)
 
 plotDispatch <- function(results, dates, plotTitle, hours=24){
   
@@ -706,17 +750,20 @@ compareObjectives <- function(resultslist){
   
   setwd(paste(baseWD, "post_processing", "figures", sep="/"))
   ggsave(paste0("dailyobjectives",".png"), width=12, height=6)
-  return(valuedf)
+  return(objectivedf)
   
 }
 
-<<<<<<< HEAD
-dates1 <- seq(as.POSIXct("9/1/2019", format = "%m/%d/%Y"), by="day", length.out=10) # Configure cases period here
+dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=31) # Configure cases period here
 dates2 <- seq(as.POSIXct("2/1/2019", format = "%m/%d/%Y"), by="day", length.out=4)
 
 
-results1 <- loadResults(dates1,folder='303.301SS_Wind303',subfolder="results_DA_RTVRE")
-results2 <- loadResults(dates1,folder='303.301SS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
+results1 <- loadResults(dates1,folder='303.301NSS_NoWind',subfolder="results_DA_RTVRE")
+results2 <- loadResults(dates1,folder='303SS_301NSS_NoWind',subfolder="results_DA_RTVRE")
+results3 <- loadResults(dates1, folder='303.301SS_NoWind',subfolder="results_DA_RTVRE")
+
+results4 <- loadResults(dates1,folder='303.301NSS_Wind303',subfolder="results_DA_RTVRE")
+results5 <- loadResults(dates1,folder='303.301SS_Wind303',subfolder="results_DA_RTVRE")
 #results3 <- loadResults(dates1,folder="303.301SS_Wind303",subfolder="results_DA")
 #results1RT  <- loadResultsRT(dates1,folder='303.301SS_Wind303')
 
@@ -726,47 +773,31 @@ results2 <- loadResults(dates1,folder='303.301SS_Wind303_MitigateOffer',subfolde
 #df2 <- compareObjectives(caselist)
 #df2$delta <- df2$SSProfit-df2$Objective
 #write.csv(df2,"df2.csv")
-=======
-dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=365) # Configure cases period here
-dates2 <- seq(as.POSIXct("6/1/2019", format = "%m/%d/%Y"), by="day", length.out=30)
-
-
-results1 <- loadResults(dates1,folder='303.301NSS_Wind303',subfolder="results_DA_RTVRE")
-results2 <- loadResults(dates1,folder='303.301NSS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
-
-results3 <- loadResults(dates1,folder='303.301SS_Wind303',subfolder="results_DA_RTVRE")
-results4 <- loadResults(dates1,folder='303.301SS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
-
-results5 <- loadResults(dates1,folder='303SS_301NSS_Wind303',subfolder="results_DA_RTVRE")
-results6 <- loadResults(dates1,folder='303SS_301NSS_Wind303_MitigateOffer',subfolder="results_DA_RTVRE")
-
-results5DA <- loadResults(dates1,folder='303SS_301NSS_Wind303',subfolder="results_DA")
-
 #303.301SS_Wind303_MitigateOffer
 
 #results3 <- loadResults(dates1,folder="303SS_Wind303",subfolder="results_DA_RTVRE")
 #results1RT  <- loadResultsRT(dates1,folder='BothNSS_Wind303')
 
-caselist <- list(results5, results6)
-names(caselist) <- c('day-ahead','mitigate')
+caselist <- list(results4, results5)
+names(caselist) <- c('NSS','SS')
 #names(caselist) <- c('NSS',"SS",'mix')
-df4 <- compareObjectives(caselist)
-df2$delta <- df2$SSProfit-df2$Objective
+df2 <- compareObjectives(caselist)
+df4$delta <- df2$SSProfit-df2$Objective
 write.csv(df2,"df2.csv")
->>>>>>> b05fcea3f909dbe4cdb34be16d10f111b9e71c63
-#results2 <- loadResults(dates2,folder='test')
-# <- loadResultsRT(dates2,folder='test')
+
 
 #plotDispatch(results2,dates2,plotTitle='Feb',F)
 
-<<<<<<< HEAD
 d1 <- plotDispatch(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
-d2 <- plotPrices(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
-d3 <- plotStorage(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
+d2NSS <- plotPrices(results1,dates1,plotTitle='July 28 NSS')
+d3 <- plotStorage(results1,dates1,plotTitle='July 28 A')
 
 d1bind <- plotDispatch(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
-d2bind <- plotPrices(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
-d3bind <- plotStorage(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
+d2SS <- plotPrices(results3,dates1,plotTitle='July 28 2SS')
+d3bind <- plotStorage(results2,dates1,plotTitle='July 28 B')
+
+d4NSS <- plotPrices(results4, dates1, plotTitle="July 28 NSS WIND")
+d4SS <- plotPrices(results5, dates1, plotTitle="July 28 SS WIND")
 
 #d1RT <- plotDispatch(results1RT,dates1,plotTitle='Jan 1 2019 RT')
 #d2RT <- plotPrices(results1RT,dates1,plotTitle='Jan 1 2019 RT')
@@ -775,29 +806,38 @@ d3bind <- plotStorage(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
 #compareplotDispatch(d1,d1RT)
 #compareplotPrices(d2,d2RT)
 #compareplotStorage(d3,d3RT)
-=======
+
 d1 <- plotDispatch(results3,dates1,plotTitle='SSWind')
-d2 <- plotPrices(results3,dates1,plotTitle='SSWind')
+d2 <- plotPrices(results5,dates1,plotTitle='SSWind')
 d3 <- plotStorage(results3,dates1,plotTitle='SSWind')
 
 d1NSS <- plotDispatch(results1,dates1,plotTitle='NSSWind')
-d2NSS <- plotPrices(results1,dates1,plotTitle='NSSWind')
+
 d3NSS <- plotStorage(results1,dates1,plotTitle='NSSWind')
 
 compareplotDispatch(d1,d1NSS)
-compareplotPrices(d2,d2NSS)
-compareplotStorage(d3,d3NSS)
->>>>>>> b05fcea3f909dbe4cdb34be16d10f111b9e71c63
 
-caselist <- list(d3,d3bind)
+
+compareplotPrices(d2,d2bind)
+compareplotStorage(d3,d3bind)
+
+
+caselist <- list(d3,d3)
 names(caselist) <- c('day-ahead','real-time')
 compareStorageHeatplot(caselist)
 compareStorageHeatplot(caselist,type='lmp')
 compareStorageProfit(caselist,plotTitle='test',resolution='month')
 
-caselist <- list(cleanDispatchCost(results1,dates1),cleanDispatchCost(results2,dates1))
-names(caselist) <- c('day-ahead','real-time')
+caselist <- list(cleanDispatchCost(results1,dates1),cleanDispatchCost(results3,dates1))
+names(caselist) <- c('NSS','SS')
 compareTotalGeneratorCost(caselist,plotTitle='test',resolution='month')
+
+caselist <- list(cleanDispatchCost(results4,dates1,type="lmp"),
+                 cleanDispatchCost(results5,dates1,type="lmp"))
+names(caselist) <- c('NSS','SS')
+
+cleanDispatchCost(results1,dates1)
+compareTotalGeneratorCost(caselist,plotTitle='LMPTestwind',resolution='month')
 
 caselist <- list(cleanDispatchProfit(results1,dates1),cleanDispatchProfit(results2,dates1))
 names(caselist) <- c('day-ahead','real-time')
