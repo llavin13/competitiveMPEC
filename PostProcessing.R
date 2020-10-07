@@ -184,7 +184,7 @@ plotPrices <- function(results,dates,plotTitle,hours=24){
   prices$X <- as.character(prices$X)
   
   prices <- prices[prices$X %in% c("301"),]
-  print(prices)
+  #print(prices)
   #Luke's plotting code (active)
   ggplot(data=prices, aes(x=datetime, y=LMP, color=busID)) + geom_line(lwd=1.5) +
     theme_classic() + ylab("$/MWh") + xlab("") +
@@ -213,10 +213,11 @@ names(plist) <- c("A","B","C")
 plotAllPrices(plist)
 
 
-priceA <- plotPrices(resultsB,dates1,plotTitle='NSSWind')
-priceB <- plotPrices(resultsE,dates1,plotTitle='SSNoWind')
-alist <- list(priceA,priceB)
-names(alist) <- c("A","B")
+priceA <- plotPrices(resultsA,dates2,plotTitle='SSWind')
+priceB <- plotPrices(resultsB,dates2,plotTitle='NSSWind')
+priceC <- plotPrices(resultsB,dates2,plotTitle='NSSWindbus301')
+alist <- list(priceA,priceB,priceC)
+names(alist) <- c("A","B","C")
 plotAllPrices(alist)
 
 
@@ -626,7 +627,7 @@ compareStorageProfit <- function(storagedflist,plotTitle='hi',resolution='NA'){
   return(storagedf)
 }
 
-d3SS <- plotStorage(resultsE,dates1,plotTitle="SSNoWind")
+d3SS <- plotStorage(resultsA,dates1,plotTitle="SSWind")
 d3NSS <- plotStorage(resultsB,dates1,plotTitle='NSSWind')
 
 plist <- list(d3SS,d3NSS)
@@ -680,8 +681,8 @@ compareGeneratorProfit <- function(generatordflist,plotTitle='hi',resolution='NA
   ggsave(paste0("generator profit plot",plotTitle,".png"), width=12, height=6)
   return(gendf)
 }
-caselist <- list(cleanDispatchProfit(resultsA,dates1),cleanDispatchProfit(resultsC,dates1))
-names(caselist) <- c('SS','SS2x')
+caselist <- list(cleanDispatchProfit(resultsA,dates1),cleanDispatchProfit(resultsB,dates1))
+names(caselist) <- c('SS','NSS')
 compareGeneratorProfit(caselist,plotTitle='1storage',resolution='month')
 #cleanOffer(results1,dates1) #takes awhile bc big file
 
@@ -775,8 +776,19 @@ compareObjectives <- function(resultslist){
   
 }
 
+SumTxCongestion <- function(resultslist){
+  txlist <- list()
+  for (i in 1:length(resultslist)){
+    resultslist[[i]]$txflows$label <- names(resultslist[i])
+  }
+  txdf <- rbind(resultslist[[2]]$txflows,resultslist[[1]]$txflows)
+  txdf$pmt <- txdf$
+  txpmt <- ddply(txdf, ~ label, summarise, pmt = sum(pmt))
+  return(txpmt)
+}
+
 dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=31) # Configure cases period here
-dates2 <- seq(as.POSIXct("2/1/2019", format = "%m/%d/%Y"), by="day", length.out=4)
+dates2 <- seq(as.POSIXct("1/14/2019", format = "%m/%d/%Y"), by="day", length.out=7)
 
 resultsA <- loadResults(dates1,folder='303SS_Wind303',subfolder="results_DA_RTVRE")
 resultsB <- loadResults(dates1,folder='303NSS_Wind303',subfolder="results_DA_RTVRE")
@@ -785,6 +797,8 @@ resultsD <- loadResults(dates1,folder='303NSS_Wind303_2xstorage',subfolder="resu
 
 resultsE <- loadResults(dates1,folder="303SS_NoWind",subfolder="results_DA_RTVRE")
 resultsF <- loadResults(dates1,folder="303NSS_NoWind",subfolder="results_DA_RTVRE")
+
+resultsA$txFlows
 
 results1 <- loadResults(dates1,folder='303.301NSS_NoWind',subfolder="results_DA_RTVRE")
 results2 <- loadResults(dates1,folder='303SS_301NSS_NoWind',subfolder="results_DA_RTVRE")
@@ -806,8 +820,8 @@ results5 <- loadResults(dates1,folder='303.301SS_Wind303',subfolder="results_DA_
 #results3 <- loadResults(dates1,folder="303SS_Wind303",subfolder="results_DA_RTVRE")
 #results1RT  <- loadResultsRT(dates1,folder='BothNSS_Wind303')
 
-caselist <- list(resultsA, resultsB)
-names(caselist) <- c('SSNowind',"NSS")
+caselist <- list(resultsC, resultsD)
+names(caselist) <- c('SSwind',"NSSWind")
 #names(caselist) <- c('NSS',"SS",'mix')
 df3 <- compareObjectives(caselist)
 df4$delta <- df2$SSProfit-df2$Objective
@@ -857,11 +871,11 @@ caselist <- list(cleanDispatchCost(results1,dates1),cleanDispatchCost(results3,d
 names(caselist) <- c('NSS','SS')
 compareTotalGeneratorCost(caselist,plotTitle='test',resolution='month')
 
-caselist <- list(cleanDispatchCost(results4,dates1,type="lmp"),
-                 cleanDispatchCost(results5,dates1,type="lmp"))
-names(caselist) <- c('NSS','SS')
+caselist <- list(cleanDispatchCost(resultsA,dates1,type="lmp"),
+                 cleanDispatchCost(resultsB,dates1,type="lmp"))
+names(caselist) <- c('SS','NSS')
 
-cleanDispatchCost(results1,dates1)
+#cleanDispatchCost(results1,dates1)
 compareTotalGeneratorCost(caselist,plotTitle='LMPTestwind',resolution='month')
 
 caselist <- list(cleanDispatchProfit(results1,dates1),cleanDispatchProfit(results2,dates1))

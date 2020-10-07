@@ -199,7 +199,7 @@ class LoadNRELData(object):
             input_dict {dict} -- dictionary of input data updated with constants to be used in the case
         """
         input_dict["hours"] = 24
-        input_dict["periods"] = 288 #Need to config periods if change RT resolution
+        input_dict["periods"] = 288  # Need to config periods if change RT resolution
         input_dict["lb_to_tonne"] = 0.000453592
         input_dict["baseMVA"] = 100
         input_dict["km_per_mile"] = 1.60934
@@ -497,15 +497,18 @@ class CreateRTSCase(object):
             "HybridIndex",
         ]
         # size_scalar*
+
         self.storage_dict[index_list[0]] = self.gen_data[
             self.gen_data["Unit Type"] == "STORAGE"
         ]["GEN UID"].values
-        self.storage_dict[index_list[1]] = self.gen_data[
-            self.gen_data["Unit Type"] == "STORAGE"
-        ]["PMax MW"].values
-        self.storage_dict[index_list[2]] = self.gen_data[
-            self.gen_data["Unit Type"] == "STORAGE"
-        ]["PMax MW"].values
+        self.storage_dict[index_list[1]] = (
+            self.gen_data[self.gen_data["Unit Type"] == "STORAGE"]["PMax MW"].values
+            * capacity_scalar
+        )
+        self.storage_dict[index_list[2]] = (
+            self.gen_data[self.gen_data["Unit Type"] == "STORAGE"]["PMax MW"].values
+            * capacity_scalar
+        )
         self.storage_dict[index_list[3]] = [
             duration_scalar * self.storage_data.at[1, "Max Volume GWh"] * 1000
         ] * len(self.storage_dict[index_list[0]])
@@ -586,8 +589,7 @@ class CreateRTSCase(object):
         gen_cap_list = []
         for h in range(self.period_begin, self.period_end):
             for gen, capacity in zip(
-                self.generators_dict["Gen_Index"],
-                self.generators_dict["Capacity"],
+                self.generators_dict["Gen_Index"], self.generators_dict["Capacity"],
             ):
                 if gen in self.hydro_data_rt.columns:
                     gen_cap_list.append(self.hydro_data_rt.at[h, gen])
@@ -610,18 +612,31 @@ class CreateRTSCase(object):
     def scheduled_gens_rt_da_tmp(self, filename):
         scheduled_dict = {}
         scheduled_gens = pd.read_csv(
-            os.path.join(self.directory.RESULTS_INPUTS_DIRECTORY, "generators_scheduled_availability.csv")
+            os.path.join(
+                self.directory.RESULTS_INPUTS_DIRECTORY,
+                "generators_scheduled_availability.csv",
+            )
         )
         scheduled_gens_rt = pd.read_csv(
-            os.path.join(self.directory.RESULTS_INPUTS_DIRECTORY, "generators_scheduled_availability_rt.csv")
+            os.path.join(
+                self.directory.RESULTS_INPUTS_DIRECTORY,
+                "generators_scheduled_availability_rt.csv",
+            )
         )
         for h in range(1, 25):
-            tmp = scheduled_gens_rt.loc[scheduled_gens_rt['timepoint'].isin(range((h-1)*12+1,h*12+1))]
-            mean = tmp.groupby('Gen_Index')['Capacity'].mean()
+            tmp = scheduled_gens_rt.loc[
+                scheduled_gens_rt["timepoint"].isin(range((h - 1) * 12 + 1, h * 12 + 1))
+            ]
+            mean = tmp.groupby("Gen_Index")["Capacity"].mean()
             for gen in self.generators_dict["Gen_Index"]:
-                scheduled_gens.loc[(scheduled_gens['timepoint']==h) & (scheduled_gens['Gen_Index']==gen), 'Capacity'] = mean[gen]
+                scheduled_gens.loc[
+                    (scheduled_gens["timepoint"] == h)
+                    & (scheduled_gens["Gen_Index"] == gen),
+                    "Capacity",
+                ] = mean[gen]
         scheduled_gens.to_csv(
-            os.path.join(self.directory.RESULTS_INPUTS_DIRECTORY, filename + ".csv"), index = False
+            os.path.join(self.directory.RESULTS_INPUTS_DIRECTORY, filename + ".csv"),
+            index=False,
         )
 
     def timepoints(self, filename):

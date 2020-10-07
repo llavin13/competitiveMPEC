@@ -39,9 +39,9 @@ kw_dict = data_class.define_constants(kw_dict)
 # inputs for running
 start = datetime.datetime.strptime("01-01-2019", "%m-%d-%Y")  # day case starts on
 end = datetime.datetime.strptime(
-    "01-01-2020", "%m-%d-%Y"
+    "02-01-2019", "%m-%d-%Y"
 )  # day case ends on. Generally this can be 01-01-2020.
-folder_out = "303NSS_NoWind"  # name of folder to write the case to
+folder_out = "303SS_Wind303_6xstorage"  # name of folder to write the case to
 
 # optional inputs for running
 # these define differences between cases
@@ -59,16 +59,16 @@ optional_args = {
         "PV",
         "CSP",
     ],
-    "owned_gens": [],
-    "owned_storage": [],
+    "owned_gens": ["303_WIND_1"],
+    "owned_storage": ["313_STORAGE_1"],
     "hybrid_gens": [],
     "hybrid_storage": [],
     "retained_buses": [
         a for a in range(301, 326)
     ],  # [a for a in range(301, 326)] to use only area 3 buses
     "storage_bus": 303,
-    "storage_capacity_scalar": 1,
-    "storage_duration_scalar": 1,
+    "storage_capacity_scalar": 6,
+    "storage_duration_scalar": 6,
     "tx_capacity_scalar": 1,
     "battery_roundtrip_efficiency": 0.85,
     "start_cost_scalar": 0,
