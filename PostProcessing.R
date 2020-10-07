@@ -212,6 +212,14 @@ plist <- list(d2SS,d2NSS,d2slack)
 names(plist) <- c("A","B","C")
 plotAllPrices(plist)
 
+
+priceA <- plotPrices(resultsB,dates1,plotTitle='NSSWind')
+priceB <- plotPrices(resultsE,dates1,plotTitle='SSNoWind')
+alist <- list(priceA,priceB)
+names(alist) <- c("A","B")
+plotAllPrices(alist)
+
+
 compareplotPrices <- function(prices_df1,prices_df2){
   
   pricesdelta_df <- merge(prices_df1, prices_df2, by = c("datetime","zone","busID"))
@@ -618,8 +626,8 @@ compareStorageProfit <- function(storagedflist,plotTitle='hi',resolution='NA'){
   return(storagedf)
 }
 
-d3SS <- plotStorage(results5,dates1,plotTitle="SSWind")
-d3NSS <- plotStorage(results4,dates1,plotTitle='NSSWind')
+d3SS <- plotStorage(resultsE,dates1,plotTitle="SSNoWind")
+d3NSS <- plotStorage(resultsB,dates1,plotTitle='NSSWind')
 
 plist <- list(d3SS,d3NSS)
 names(plist) <- c("SS","NSS")
@@ -672,9 +680,9 @@ compareGeneratorProfit <- function(generatordflist,plotTitle='hi',resolution='NA
   ggsave(paste0("generator profit plot",plotTitle,".png"), width=12, height=6)
   return(gendf)
 }
-caselist <- list(cleanDispatchProfit(results4,dates1),cleanDispatchProfit(results5,dates1))
-names(caselist) <- c('NSS','SS')
-compareGeneratorProfit(caselist,plotTitle='test',resolution='month')
+caselist <- list(cleanDispatchProfit(resultsA,dates1),cleanDispatchProfit(resultsC,dates1))
+names(caselist) <- c('SS','SS2x')
+compareGeneratorProfit(caselist,plotTitle='1storage',resolution='month')
 #cleanOffer(results1,dates1) #takes awhile bc big file
 
 cleanEmissions <- function(results,dates,hours=24){
@@ -773,6 +781,10 @@ dates2 <- seq(as.POSIXct("2/1/2019", format = "%m/%d/%Y"), by="day", length.out=
 resultsA <- loadResults(dates1,folder='303SS_Wind303',subfolder="results_DA_RTVRE")
 resultsB <- loadResults(dates1,folder='303NSS_Wind303',subfolder="results_DA_RTVRE")
 resultsC <- loadResults(dates1,folder='303SS_Wind303_2xstorage',subfolder="results_DA_RTVRE")
+resultsD <- loadResults(dates1,folder='303NSS_Wind303_2xstorage',subfolder="results_DA_RTVRE")
+
+resultsE <- loadResults(dates1,folder="303SS_NoWind",subfolder="results_DA_RTVRE")
+resultsF <- loadResults(dates1,folder="303NSS_NoWind",subfolder="results_DA_RTVRE")
 
 results1 <- loadResults(dates1,folder='303.301NSS_NoWind',subfolder="results_DA_RTVRE")
 results2 <- loadResults(dates1,folder='303SS_301NSS_NoWind',subfolder="results_DA_RTVRE")
@@ -794,8 +806,8 @@ results5 <- loadResults(dates1,folder='303.301SS_Wind303',subfolder="results_DA_
 #results3 <- loadResults(dates1,folder="303SS_Wind303",subfolder="results_DA_RTVRE")
 #results1RT  <- loadResultsRT(dates1,folder='BothNSS_Wind303')
 
-caselist <- list(resultsA, resultsB,resultsC)
-names(caselist) <- c('SS','NSS','2xSS')
+caselist <- list(resultsA, resultsB)
+names(caselist) <- c('SSNowind',"NSS")
 #names(caselist) <- c('NSS',"SS",'mix')
 df3 <- compareObjectives(caselist)
 df4$delta <- df2$SSProfit-df2$Objective
@@ -830,8 +842,8 @@ d3NSS <- plotStorage(results1,dates1,plotTitle='NSSWind')
 compareplotDispatch(d1,d1NSS)
 
 priceA <- plotPrices(resultsA,dates1,plotTitle='SSWind_')
-priceB <- plotPrices(resultsA,dates1,plotTitle='NSSWind_')
-compareplotPrices(d2,d2bind)
+priceB <- plotPrices(resultsB,dates1,plotTitle='NSSWind_')
+compareplotPrices(priceA,d2bind)
 compareplotStorage(d3,d3bind)
 
 

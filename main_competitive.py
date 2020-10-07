@@ -35,14 +35,14 @@ from utility_functions import (
 )
 
 start_time = time.time()
-cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test106")
+cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test919")
 
 ### GENERAL INPUTS ###
-case_folder = "303NSS_Wind303_2xstorage"  # andWind309
+case_folder = "303NSS_NoWind"  # andWind309
 
 # start from 7/1
-start_date = "01-02-2019"  # use this string format
-end_date = "02-01-2019"  # end date is exclusive
+start_date = "02-01-2019"  # use this string format
+end_date = "01-01-2020"  # end date is exclusive
 MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
 # the second value is how many tmps to subset RT cases into
@@ -59,7 +59,7 @@ solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
     "mip_tolerances_integrality": 0.000000001,
-    "simplex_tolerances_feasibility": 0.01,
+    "simplex_tolerances_feasibility": 0.1,
     "dettimelimit": 100000,
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
