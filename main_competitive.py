@@ -35,10 +35,10 @@ from utility_functions import (
 )
 
 start_time = time.time()
-cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test919")
+cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "test106")
 
 ### GENERAL INPUTS ###
-case_folder = "303NSS_Wind303_6xstorage"  # andWind309
+case_folder = "303SS_Wind303_6xstorage"  # andWind309
 
 # start from 7/1
 start_date = "01-01-2019"  # use this string format
