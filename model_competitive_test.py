@@ -478,7 +478,7 @@ dispatch_model.gensegmentmax_dual = Var(
     dispatch_model.GENERATORSEGMENTS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.gensegmentmin_dual = Var(
@@ -487,7 +487,7 @@ dispatch_model.gensegmentmin_dual = Var(
     dispatch_model.GENERATORSEGMENTS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.transmissionmax_dual = Var(
@@ -495,7 +495,7 @@ dispatch_model.transmissionmax_dual = Var(
     dispatch_model.TRANSMISSION_LINE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.transmissionmin_dual = Var(
@@ -503,7 +503,7 @@ dispatch_model.transmissionmin_dual = Var(
     dispatch_model.TRANSMISSION_LINE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.socmax_dual = Var(
@@ -511,7 +511,7 @@ dispatch_model.socmax_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.socmin_dual = Var(
@@ -519,7 +519,7 @@ dispatch_model.socmin_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.rampmax_dual = Var(
@@ -527,7 +527,7 @@ dispatch_model.rampmax_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.rampmin_dual = Var(
@@ -535,7 +535,7 @@ dispatch_model.rampmin_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.voltageanglemax_dual = Var(
@@ -543,7 +543,7 @@ dispatch_model.voltageanglemax_dual = Var(
     dispatch_model.ZONES,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.voltageanglemin_dual = Var(
@@ -551,7 +551,7 @@ dispatch_model.voltageanglemin_dual = Var(
     dispatch_model.ZONES,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.storagetight_dual = Var(
@@ -559,7 +559,7 @@ dispatch_model.storagetight_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 50),
 )
 
 dispatch_model.chargemin_dual = Var(
@@ -567,7 +567,7 @@ dispatch_model.chargemin_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.dischargemin_dual = Var(
@@ -575,31 +575,31 @@ dispatch_model.dischargemin_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.finalsoc_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 1000000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
 )
 
 dispatch_model.finalsocmax_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 1000000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
 )
 
 dispatch_model.finalsocmin_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 1000000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
 )
 
 dispatch_model.onecycle_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 1000000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
 )
 
 dispatch_model.bindonecyclemax_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 1000000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
 )
 
 dispatch_model.bindonecyclemin_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 1000000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
 )
 
 dispatch_model.gendispatchmax_dual = Var(
@@ -607,7 +607,7 @@ dispatch_model.gendispatchmax_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.gendispatchmin_dual = Var(
@@ -615,7 +615,7 @@ dispatch_model.gendispatchmin_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.startupshutdown_dual = Var(
@@ -623,7 +623,7 @@ dispatch_model.startupshutdown_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.nucdispatchmax_dual = Var(
@@ -631,7 +631,7 @@ dispatch_model.nucdispatchmax_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 dispatch_model.nucdispatchmin_dual = Var(
@@ -639,7 +639,7 @@ dispatch_model.nucdispatchmin_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 1000000),
+    bounds=(0, 5000),
 )
 
 # offer-related variables (since generators no longer just offer at marginal cost)

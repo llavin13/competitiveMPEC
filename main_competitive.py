@@ -35,14 +35,14 @@ from utility_functions import (
 )
 
 start_time = time.time()
-cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_12.6")
+cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_1.16")
 
 ### GENERAL INPUTS ###
-case_folder = "Wind303_2x303SS"#"Colocated303_303NSS"  #Wind303_2x303NSS
+case_folder = "Wind303_2x303NSS"#"Colocated303_303NSS"  #Wind303_2x303NSS
 
 # start from 7/1
-start_date = "01-01-2019"  # use this string format
-end_date = "02-01-2019"  # end date is exclusive
+start_date = "01-06-2019"  # use this string format
+end_date = "01-07-2019"  # end date is exclusive
 MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
 # the second value is how many tmps to subset RT cases into
@@ -55,12 +55,12 @@ RTVRE = False  # if True **AND** RT==False, run DA case with real-time VRE data;
 ### OPTIONAL SOLVER INPUTS ###
 executable_path = ""  # if you wish to specify cplex.exe path
 solver_name = "cplex"  # only change if you wish to use a solver other than cplex
+#"simplex_tolerances_feasibility": 0.01,
+#"mip_tolerances_integrality": 0.000000001,
 solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
-    "mip_tolerances_integrality": 0.000000001,
-    "simplex_tolerances_feasibility": 0.01,
-    "dettimelimit": 175000,
+    "dettimelimit": 100000,
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
 ### OPTIONAL MODEL MODIFYING INPUTS ###
