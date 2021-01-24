@@ -502,10 +502,10 @@ class CreateRTSCase(object):
         ]["GEN UID"].values
         self.storage_dict[index_list[1]] = self.gen_data[
             self.gen_data["Unit Type"] == "STORAGE"
-        ]["PMax MW"].values
+        ]["PMax MW"].values*capacity_scalar
         self.storage_dict[index_list[2]] = self.gen_data[
             self.gen_data["Unit Type"] == "STORAGE"
-        ]["PMax MW"].values
+        ]["PMax MW"].values*capacity_scalar
         self.storage_dict[index_list[3]] = [
             duration_scalar * self.storage_data.at[1, "Max Volume GWh"] * 1000
         ] * len(self.storage_dict[index_list[0]])
@@ -623,6 +623,60 @@ class CreateRTSCase(object):
         scheduled_gens.to_csv(
             os.path.join(self.directory.RESULTS_INPUTS_DIRECTORY, filename + ".csv"), index = False
         )
+
+    def zonal_loads_rt_da_tmp(self, filename):
+        bus_df = self.bus_data[["Bus ID", "MW Load", "Area"]]
+        bus_df_load = pd.merge(
+            bus_df,
+            bus_df.groupby("Area").sum()[["MW Load"]].reset_index(),
+            how="left",
+            left_on="Area",
+            right_on="Area",
+        )
+        bus_df_load["Frac Load"] = bus_df_load["MW Load_x"] / bus_df_load["MW Load_y"]
+        hourly_df = pd.concat([bus_df_load] * self.periods, ignore_index=True)
+        hourly_df["timepoint"] = [
+            e
+            for e in self.timepoint_rt_dict["timepoint"]
+            for i in self.zone_dict["zone"]
+        ]
+        # print(load_data_rt)
+        load_short = (
+            self.load_data_rt.loc[self.hour_begin : self.period_end - 1]
+            .set_index(["Month", "Day", "Period"])
+            .reset_index()
+        )  # sets unique index
+        hourly_df["zonal_load"] = [
+            load_short.at[t - 1, str(a)]
+            for t, a in zip(hourly_df["timepoint"].values, hourly_df["Area"].values)
+        ]
+        hourly_df["bus load"] = hourly_df["zonal_load"] * hourly_df["Frac Load"]
+
+        #run the grouping of hourly df to go from 5-min to hourly
+        hourly_df['da_tmp'] = hourly_df.apply(lambda x: np.ceil(x['timepoint']/12.),axis=1)
+        hourly_df['da_tmp'].astype(int)
+        grouped_hourly_df = hourly_df.groupby(["Bus ID","da_tmp"])["bus load"].mean().reset_index()
+        grouped_hourly_df.sort_values(by=['da_tmp','Bus ID'],inplace=True)
+        #print(grouped_hourly_df)
+
+        time_zone_dict = {}
+        index_list = ["timepoint", "zone", "gross_load"]
+
+        time_zone_dict[index_list[0]] = [
+            e
+            for e in self.timepoint_dict["timepoint"]
+            for i in self.zone_dict["zone"]
+        ]
+        time_zone_dict[index_list[1]] = [
+            i
+            for e in self.timepoint_dict["timepoint"]
+            for i in self.zone_dict["zone"]
+        ]
+        time_zone_dict[index_list[2]] = grouped_hourly_df[
+            "bus load"
+        ].values  # hourly_df['MW Load_x'].values
+
+        self.dict_to_csv(filename, time_zone_dict, index="timepoint")
 
     def timepoints(self, filename):
         self.timepoint_dict = {}
@@ -1408,6 +1462,7 @@ def write_RTS_case(kw_dict, start, end, dir_structure, case_folder, **kwargs):
         case.zones("zones")
         case.zonal_loads("timepoints_zonal")
         case.zonal_loads_rt("timepoints_zonal_rt")
+        case.zonal_loads_rt_da_tmp("timepoints_zonal_rt_da_tmp")
         case.tx_lines("transmission_lines")
         case.tx_lines_hourly(
             "transmission_lines_hourly", flow_multiplier=flow_multiplier

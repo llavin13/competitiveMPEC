@@ -171,6 +171,7 @@ class CreateAndRunScenario(object):
             write_results_competitive.export_results(
                 instance,
                 solution_pre,
+                self.scenario_inputs_directory,
                 self.scenario_results_directory,
                 False,
                 0,
@@ -357,6 +358,7 @@ class CreateAndRunScenario(object):
         write_results_competitive.export_results(
             self.instance,
             self.solution,
+            self.scenario_inputs_directory,
             self.scenario_results_directory,
             self.is_MPEC,
             self.gap,
@@ -626,6 +628,8 @@ class StorageOfferMitigation(object):
         if not self.mitigation_flag:
             storage_df.ChargeMaxOffer = [5000 for i in storage_df.ChargeMaxOffer]
             storage_df.DischargeMaxOffer = [5000 for i in storage_df.DischargeMaxOffer]
+        #print(storage_df)
+        #print(self.mitigation_flag)
         storage_df.to_csv(
             os.path.join(self.case_directory.INPUTS_DIRECTORY, "storage_offers.csv"),
             index=False,

@@ -93,7 +93,7 @@ def scenario_inputs(inputs_directory):
     )
 
     data.load(
-        filename=os.path.join(inputs_directory, "timepoints_zonal.csv"),
+        filename=os.path.join(inputs_directory, "timepoints_zonal_rt_da_tmp.csv"),
         param=(model_competitive_test.dispatch_model.GrossLoad,),
     )
 
