@@ -717,17 +717,23 @@ cleanDispatchCost <- function(results,dates,type='NA',filter='None',hour=24){
 }
 
 
-cleanDispatchProfit <- function(results,dates,type='NA',filter='None',hour=24){
+cleanDispatchProfit <- function(results,dates,type='NA',filter='None',overwrite_gen="None",hour=24){
   gc <- results[['generatorresources']]$Gen_Index[results[['generatorresources']]$GencoIndex == 1]
   offer <- results[['offer']]
   offer <- offer[,c("X","SegmentDispatch","LMP","date")]
+  
   nucoffer <- results[['nucoffer']]
   nucoffer <- nucoffer[,c("X","dispatch","lmp","date")]
   colnames(nucoffer)=c("X","SegmentDispatch","LMP","date")
   offer <- rbind(offer, nucoffer)
   offer$segID <- gsub("[[:print:]]*-", "", offer[,1])
   offer$genID <- gsub("-\\d+","",offer[,1])
-  offer <- offer[offer$genID==gc,]
+  if (overwrite_gen=="None"){
+    offer <- offer[offer$genID==gc,]
+  }
+  else{
+    offer <- offer[offer$genID==overwrite_gen,]
+  }
   offer$dispatchprofit <- offer$SegmentDispatch * offer$LMP
   if (filter!='None'){
     offer <- offer[offer$genID==filter,]
@@ -834,7 +840,7 @@ compareForecastErrors2 <- function(rlist){
   NetLoadDF <- LoadDF
   NetLoadDF$label <- "Net Load"
   
-  NetLoadDF$MW <- LoadDF$MW+Wind$MW+Solar$MW+RTPV$MW
+  NetLoadDF$MW <- LoadDF$MW-Wind$MW-Solar$MW-RTPV$MW
   
   #group by tmp and date
   FE_df <- rbind(Wind,Solar,RTPV,LoadDF,NetLoadDF)
@@ -1093,7 +1099,7 @@ profitResultsPairs(list(list(resultsSS300_900,resultsNSS300_900),
 a<-LoadWindScatter(resultsD,list(resultsC,resultsC,resultsF))
 e<-LoadWindScatter(resultsA,resultsB)
 
-dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=31) # Configure cases period here
+dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=10) # Configure cases period here
 dates2 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=59)
 dates3 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=2)
 resultsDispatch <- loadResults(dates3,folder='NoStorageDispatch',subfolder="results_DA")
@@ -1126,7 +1132,7 @@ resultsNSS100_300 <- loadResults(dates1,folder='303NSS_Wind303_100_300',subfolde
 resultsSS200_600 <-loadResults(dates1,folder='303SS_Wind303_200_600',subfolder="results_DA")
 resultsNSS200_600 <- loadResults(dates1,folder='303NSS_Wind303_200_600',subfolder="results_DA")
 resultsSS300_900 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
-resultsNSS300_900 <- loadResults(dates1,folder='303NSS_Wind303_300_900_DISPATCH',subfolder="results_DA")
+resultsNSS300_900 <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
 
 resultsSS50_50 <-loadResults(dates1,folder='303SS_Wind303_50_50',subfolder="results_DA")
 resultsNSS50_50 <- loadResults(dates1,folder='303NSS_Wind303_50_50',subfolder="results_DA")
@@ -1137,11 +1143,23 @@ resultsSS300_2400 <-loadResults(dates1,folder='303SS_Wind303_300_2400',subfolder
 resultsNSS300_2400 <- loadResults(dates1,folder='303NSS_Wind303_300_2400',subfolder="results_DA")
 
 resultsSS300_900_DABIND <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_Bind_DA")
-resutlsNSS300_900_RTVRE <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA_RTVRE")
+resultsNSS300_900_RTVRE <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA_RTVRE")
+resultsSS300_900_RTVRE <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA_RTVRE")
+
+slist <- list(plotStorage(resultsSS300_900,dates1,plotTitle='1'),
+              plotStorage(resultsSS300_900_DABIND,dates1,plotTitle='1'),
+              plotStorage(resultsSS300_900_RTVRE,dates1,plotTitle="1"))
+names(slist) <- c("DAoptimal","dabindRT","RToptimal")
+esrprofits <- compareStorageProfit(slist,plotTitle=" ",resolution="")
 
 
-profitResultsPairs(list(list(resultsSS300_900,resultsNSS300_900),
-                        list(resultsSS300_900_DABIND,resutlsNSS300_900_RTVRE)),
+clist <- list(cleanDispatchProfit(resultsSS300_900_DABIND,dates1),
+              cleanDispatchProfit(resultsSS300_900_RTVRE),dates1)
+names(clist) <- c("dabind","RToptimal")
+totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
+
+profitResultsPairs(list(list(resultsSS300_900_RTVRE,resultsNSS300_900_RTVRE),
+                        list(resultsSS300_900_DABIND,resultsNSS300_900_RTVRE)),
                     dates1)
 
 

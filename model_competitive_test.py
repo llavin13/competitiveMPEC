@@ -326,6 +326,7 @@ def uc_generators_init(model):
     for g in model.GENERATORS:
         if model.UCIndex[g] == 2:
             uc_generators.append(g)
+    
     return uc_generators
 
 
@@ -559,7 +560,7 @@ dispatch_model.storagetight_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 50),
+    bounds=(0, 2),
 )
 
 dispatch_model.chargemin_dual = Var(
@@ -1462,6 +1463,7 @@ def BindStorageDischargeDual(model, t, s):
         t {int} -- timepoint index
         s {str} -- storage index
     """
+    
     return (
         model.sodischarge[t, s]
         + model.ChargeMax[s] * model.storagetight_dual[t, s]
@@ -2428,6 +2430,42 @@ def objective_rule2(model):
 dispatch_model.TotalCost2 = Objective(rule=objective_rule2, sense=minimize)
 
 
+def TotalCostwithStorageBidsrule(model):
+    """system operator dispatch-only objective (additionally considers storage as if its fixed offer is its marginal costs)
+    Arguments:
+        model  -- Pyomo model
+    """
+    return sum(
+        sum(
+            sum(
+                model.gsd[t, g, gs] * model.GeneratorMarginalCost[t, g, gs]
+                for t in model.ACTIVETIMEPOINTS
+            )
+            for g in model.GENERATORS
+        )
+        for gs in model.GENERATORSEGMENTS
+    )+ sum(
+        sum(
+            sum(
+                model.gsd[t, g, gs]
+                * model.marginal_CO2[t, g, gs]
+                * model.CO2_damage[t, g, gs]
+                for t in model.ACTIVETIMEPOINTS
+            )
+            for g in model.GENERATORS
+        )
+        for gs in model.GENERATORSEGMENTS
+    )+sum(
+        sum(model.sd[t, s]*model.DischargeOffer[t,s] for t in model.ACTIVETIMEPOINTS) for s in model.STORAGE
+    )+sum(
+        sum(model.sc[t, s]*model.ChargeOffer[t,s] for t in model.ACTIVETIMEPOINTS) for s in model.STORAGE
+    )-sum(
+        sum(model.sc[t, s] for t in model.ACTIVETIMEPOINTS) for s in model.STORAGE
+    )  # charge penalty
+    # DESCRIPTION OF OBJECTIVE
+    # (1) dispatch cost
+dispatch_model.TotalCostwithStorageBids = Objective(rule=TotalCostwithStorageBidsrule,sense=minimize)
+
 def objective_profit(model):
     """Simple objective I wrote to look at generator profits as only objective for model vetting
     Not currently used in any cases
@@ -2481,7 +2519,7 @@ def objective_profit_dual(model):
                 * model.Hours[t]
                 for t in model.ACTIVETIMEPOINTS
             )
-            for g in model.NON_STRATEGIC_GENERATORS
+            for g in model.NON_STRATEGIC_GENERATORS.intersection(model.NUC_GENS)
         )
         - sum(
             sum(

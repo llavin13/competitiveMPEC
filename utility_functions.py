@@ -183,7 +183,7 @@ class CreateAndRunScenario(object):
         storageclass.write_SPP_mitigated_offers()
         print("...storage offer mitigation file created")
 
-        if self.is_MPEC:
+        if self.is_MPEC and not self.is_bind_offer:
             print("Converting model to MPEC...")
             # transformed = model.transform("mpec.simple_nonlinear")
             xfrm = TransformationFactory("mpec.simple_disjunction")
@@ -195,6 +195,7 @@ class CreateAndRunScenario(object):
         return instance
 
     def solve(self, case_type, mip_iter=1, warmstart_flag=False):
+        print(case_type)
         """ solve pyomo model(s). Some recursion happens to both handle errors and 
         model relaxations (e.g., after fixing storage commitment, presolve for cases with many competitive generators)
 
@@ -218,6 +219,7 @@ class CreateAndRunScenario(object):
             )
             self.instance.TotalCost.deactivate()  # deactivates the simple objective
             self.instance.TotalCost2.deactivate()
+            self.instance.TotalCostwithStorageBids.deactivate()
             self.instance.GeneratorProfit.deactivate()
             self.instance.GeneratorProfitDualPre.activate()
             self.instance.GeneratorProfitDual.deactivate()
@@ -239,6 +241,7 @@ class CreateAndRunScenario(object):
             )
             self.instance.TotalCost.deactivate()  # deactivates the simple objective
             self.instance.TotalCost2.deactivate()
+            self.instance.TotalCostwithStorageBids.deactivate()
             self.instance.GeneratorProfit.deactivate()
             self.instance.GeneratorProfitDualPre.deactivate()
             self.instance.GeneratorProfitDual.deactivate()
@@ -253,10 +256,22 @@ class CreateAndRunScenario(object):
             self.instance.RTGeneratorProfitDualPre.deactivate()
             self.instance.RTGeneratorProfitDual.activate()
             self.instance.SSProfit.deactivate()
-
+        elif case_type == "LPStorage":
+            print('running bound DA offers as LP')
+            self.instance.TotalCost2.deactivate()
+            self.instance.TotalCost.deactivate()  # switch objective to exclude start-up and no-load costs
+            self.instance.TotalCostwithStorageBids.activate()
+            self.instance.GeneratorProfit.deactivate()
+            self.instance.GeneratorProfitDualPre.deactivate()
+            self.instance.GeneratorProfitDual.deactivate()
+            self.instance.RTGeneratorProfitDual.deactivate()
+            self.instance.RTGeneratorProfitDualPre.deactivate()
+            self.instance.SSProfit.deactivate()
         elif case_type == "LP":
+            print('RUNNING NORMAL LP')
             self.instance.TotalCost2.activate()
             self.instance.TotalCost.deactivate()  # switch objective to exclude start-up and no-load costs
+            self.instance.TotalCostwithStorageBids.deactivate()
             self.instance.GeneratorProfit.deactivate()
             self.instance.GeneratorProfitDualPre.deactivate()
             self.instance.GeneratorProfitDual.deactivate()
@@ -342,10 +357,13 @@ class CreateAndRunScenario(object):
         # Create a 'dual' suffix component on the instance, so the solver plugin will know which suffixes to collect
         self.instance.dual = Suffix(direction=Suffix.IMPORT)
 
-        if self.is_MPEC:
+        if self.is_MPEC and not self.is_bind_offer:
             self.solution_type = "MIP"
             self.solution = self.solve(self.solution_type)
-
+        elif self.is_bind_offer==True:
+            self.solution_type = "LPStorage"
+            self.solution = self.solve(self.solution_type)
+            self.is_MPEC = False #overwrite so solution is properly written with duals
         else:
             self.solution_type = "LP"
             self.solution = self.solve(

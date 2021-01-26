@@ -41,7 +41,7 @@ cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_1.16")
 case_folder = "303SS_Wind303_300_900"#"Colocated303_303NSS"  #Wind303_2x303NSS
 
 # start from 7/1
-start_date = "01-05-2019"  # use this string format
+start_date = "01-16-2019"  # use this string format
 end_date = "02-01-2019"  # end date is exclusive
 MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
@@ -58,11 +58,14 @@ executable_path = ""  # if you wish to specify cplex.exe path
 solver_name = "cplex"  # only change if you wish to use a solver other than cplex
 #"simplex_tolerances_feasibility": 0.01,
 #"mip_tolerances_integrality": 0.000000001,
+#    "read_scale":1,
+#    "simplex_tolerances_markowitz":.9,
+#"preprocessing_presolve":'y',
 solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
-    "simplex_tolerances_feasibility": 0.01,
-    "dettimelimit": 200000,
+    "simplex_tolerances_feasibility": 0.00001,
+    "dettimelimit": 250000,
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
 ### OPTIONAL MODEL MODIFYING INPUTS ###
