@@ -15,7 +15,7 @@ import numpy as np
 from pyomo.environ import value
 
 
-def export_results(instance, results, inputs_directory, results_directory, is_MPEC, gap, debug_mode):
+def export_results(instance, results, results_directory, is_MPEC, gap, debug_mode):
     """Retrieves the relevant sets over which it will loop, then call functions to export different result categories.
     If an exception is encountered, log the error traceback. If not in debug mode, exit. If in debug mode,
     open an interactive Python session that will make it possible to try to correct the error without having to re-run
@@ -33,10 +33,6 @@ def export_results(instance, results, inputs_directory, results_directory, is_MP
     """
 
     print("Exporting results... ")
-    try:
-        offer_df = pd.read_csv(join(inputs_directory,"storage_offers.csv"))
-    except FileNotFoundError:
-        print('offer file does not exist')
     # First, load solution
     load_solution(instance, results)
 
@@ -129,7 +125,7 @@ def export_results(instance, results, inputs_directory, results_directory, is_MP
     # export storage
     try:
         export_storage(
-            instance, offer_df, timepoints_set, storage_set, results_directory, is_MPEC
+            instance, timepoints_set, storage_set, results_directory, is_MPEC
         )
     except Exception as err:
         msg = "ERROR exporting storage! Check export_storage()."
@@ -723,7 +719,7 @@ def export_reserve_segment_commits(
     df.to_csv(os.path.join(results_directory, "reserve_segment_commit.csv"))
 
 
-def export_storage(instance, offer_df, timepoints_set, storage_set, results_directory, is_MPEC):
+def export_storage(instance, timepoints_set, storage_set, results_directory, is_MPEC):
     index_name = []
     results_time = []
     storage_charge = []
@@ -732,9 +728,9 @@ def export_storage(instance, offer_df, timepoints_set, storage_set, results_dire
     storage_dispatch = []
     soc = []
     storage_offer = []
-    max_storage_offer = [i for i in offer_df.DischargeMaxOffer]
+    max_storage_offer = []
     storage_charge_offer = []
-    max_storage_charge_offer = [i for i in offer_df.ChargeMaxOffer]
+    max_storage_charge_offer = []
     storage_tight_dual = []
     storage_max_dual = []
     storage_min_dual = []
@@ -758,9 +754,9 @@ def export_storage(instance, offer_df, timepoints_set, storage_set, results_dire
             storage_totaldischarge.append(format_6f(instance.totaldischarge[t, s]()))
             soc.append(format_6f(instance.soc[t, s].value))
             storage_offer.append(format_6f(instance.sodischarge[t, s].value))
-            #max_storage_offer.append(format_6f(instance.DischargeMaxOffer[t, s]))
+            max_storage_offer.append(format_6f(instance.DischargeMaxOffer[t, s]))
             storage_charge_offer.append(format_6f(instance.socharge[t, s].value))
-            #max_storage_charge_offer.append(format_6f(instance.ChargeMaxOffer[t, s]))
+            max_storage_charge_offer.append(format_6f(instance.ChargeMaxOffer[t, s]))
             storage_tight_dual.append(format_6f(instance.storagetight_dual[t, s].value))
             storage_max_dual.append(format_6f(instance.socmax_dual[t, s].value))
             storage_min_dual.append(format_6f(instance.socmin_dual[t, s].value))

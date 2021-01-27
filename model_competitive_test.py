@@ -560,7 +560,7 @@ dispatch_model.storagetight_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 2),
+    bounds=(0, 50),
 )
 
 dispatch_model.chargemin_dual = Var(
@@ -652,15 +652,19 @@ dispatch_model.gso = Var(
 )
 
 dispatch_model.go = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.GENERATORS, within=Reals,
+    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.GENERATORS, within=NonNegativeReals
 )
 
 dispatch_model.sodischarge = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=NonNegativeReals
+    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=Reals,
+    initialize=0,
+    bounds=(-50, 5000),
 )
 
 dispatch_model.socharge = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=NonNegativeReals
+    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=Reals,
+    initialize=0,
+    bounds=(-50, 5000),
 )
 
 
@@ -859,11 +863,11 @@ def DischargeOfferExceedsChargeOffer(model, t, s):
     return model.sodischarge[t, s] >= model.socharge[t, s]
 
 
-dispatch_model.StorageOfferConstraint = Constraint(
-    dispatch_model.ACTIVETIMEPOINTS,
-    dispatch_model.STORAGE,
-    rule=DischargeOfferExceedsChargeOffer,
-)
+#dispatch_model.StorageOfferConstraint = Constraint(
+#    dispatch_model.ACTIVETIMEPOINTS,
+#    dispatch_model.STORAGE,
+#    rule=DischargeOfferExceedsChargeOffer,
+#)
 
 
 ## STORAGE CONSTRAINTS ##

@@ -41,16 +41,16 @@ cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_1.16")
 case_folder = "303SS_Wind303_300_900"#"Colocated303_303NSS"  #Wind303_2x303NSS
 
 # start from 7/1
-start_date = "01-16-2019"  # use this string format
-end_date = "02-01-2019"  # end date is exclusive
-MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
+start_date = "01-15-2019"  # use this string format
+end_date = "01-20-2019"  # end date is exclusive
+MPEC = True  #if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
 # the second value is how many tmps to subset RT cases into
 EPEC, iters = False, 9  # if EPEC and max iterations if True.
 show_plots = False  # if True show plot of gen by fuel and bus LMPs after each case
 mitigate_storage_offers = False
-bind_DA_offers = False
-RTVRE = False  # if True **AND** RT==False, run DA case with real-time VRE data; if True **AND** RT==True, run RT case with RTVRE SOC bind
+bind_DA_offers = True
+RTVRE = True  # if True **AND** RT==False, run DA case with real-time VRE data; if True **AND** RT==True, run RT case with RTVRE SOC bind
 #RTLoads = True #I think it will make sense to allow DA case to pull in RT loads once offer is bound
 
 ### OPTIONAL SOLVER INPUTS ###
@@ -65,7 +65,7 @@ solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
     "simplex_tolerances_feasibility": 0.00001,
-    "dettimelimit": 250000,
+    "dettimelimit": 150000,
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
 ### OPTIONAL MODEL MODIFYING INPUTS ###

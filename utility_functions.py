@@ -164,14 +164,19 @@ class CreateAndRunScenario(object):
         print("...instance created.")
 
         print("Creating Offer Mitigation (model will solve as dispatch if TRUE)...")
+
         if self.mitigate_storage_offers:
+            self.dir_str.make_directories("_DA_Mitigated")  # update directory structure
+            self.scenario_results_directory = (
+                self.dir_str.RESULTS_DIRECTORY
+            )  # update results directory
+            # solve the dispatch LP to get ex-ante price forecast to mitigate against
             self.instance = instance
             self.instance.dual = Suffix(direction=Suffix.IMPORT)
             solution_pre = self.solve("LP")
             write_results_competitive.export_results(
-                instance,
+                self.instance,
                 solution_pre,
-                self.scenario_inputs_directory,
                 self.scenario_results_directory,
                 False,
                 0,
@@ -182,6 +187,19 @@ class CreateAndRunScenario(object):
         )
         storageclass.write_SPP_mitigated_offers()
         print("...storage offer mitigation file created")
+
+        # re-read data?
+        if self.mitigate_storage_offers and not self.is_RT and not self.is_RTVRE:
+            self.data = input_competitive_DA.scenario_inputs(
+                self.scenario_inputs_directory
+            )
+            print("... re-read day-ahead data.")
+            instance = self.model.create_instance(self.data)
+
+        elif self.mitigate_storage_offers:
+            raise Exception(
+                "cannot apply offer mitigation cases that use RT data for now"
+            )
 
         if self.is_MPEC and not self.is_bind_offer:
             print("Converting model to MPEC...")
@@ -221,8 +239,8 @@ class CreateAndRunScenario(object):
             self.instance.TotalCost2.deactivate()
             self.instance.TotalCostwithStorageBids.deactivate()
             self.instance.GeneratorProfit.deactivate()
-            self.instance.GeneratorProfitDualPre.activate()
-            self.instance.GeneratorProfitDual.deactivate()
+            self.instance.GeneratorProfitDualPre.deactivate()
+            self.instance.GeneratorProfitDual.activate()
             self.instance.RTGeneratorProfitDualPre.deactivate()
             self.instance.RTGeneratorProfitDual.deactivate()
             self.instance.SSProfit.deactivate()
@@ -316,8 +334,9 @@ class CreateAndRunScenario(object):
         except IndexError:
             print("gap is infinite, so writing 0")
             self.gap = 0.0
+        
 
-        if case_type == "MIP" and mip_iter == 1:
+        if case_type == "MIP" and mip_iter == 2: #should break this
             try:
                 warmstart_flag = self.cplex_params.pop("warmstart_flag")
             except KeyError:
@@ -376,7 +395,6 @@ class CreateAndRunScenario(object):
         write_results_competitive.export_results(
             self.instance,
             self.solution,
-            self.scenario_inputs_directory,
             self.scenario_results_directory,
             self.is_MPEC,
             self.gap,
