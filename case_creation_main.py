@@ -41,7 +41,11 @@ start = datetime.datetime.strptime("01-01-2019", "%m-%d-%Y")  # day case starts 
 end = datetime.datetime.strptime(
     "02-01-2019", "%m-%d-%Y"
 )  # day case ends on. Generally this can be 01-01-2020.
+<<<<<<< HEAD
 folder_out = "303SS_Wind303_300_900"  # name of folder to write the case to
+=======
+folder_out = "303NSS_Wind303_500_1500"  # name of folder to write the case to
+>>>>>>> 0fc2bb057e3a036bded0708a083aff86faa40229
 
 # optional inputs for running
 # these define differences between cases
@@ -61,15 +65,15 @@ optional_args = {
         "CSP",
     ],
     "owned_gens": ["303_WIND_1"],
-    "owned_storage": ["313_STORAGE_1"],
+    "owned_storage": [],
     "hybrid_gens": [],
     "hybrid_storage": [],
     "retained_buses": [
         a for a in range(301, 326)
     ],  # [a for a in range(301, 326)] to use only area 3 buses
     "storage_bus": 303,
-    "storage_capacity_scalar": 6,
-    "storage_duration_scalar": 6,
+    "storage_capacity_scalar": 10,
+    "storage_duration_scalar": 10,
     "tx_capacity_scalar": 1,
     "battery_roundtrip_efficiency": 0.85,
     "start_cost_scalar": 0,

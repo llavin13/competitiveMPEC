@@ -1209,26 +1209,32 @@ resultsSS200_600 <-loadResults(dates1,folder='303SS_Wind303_200_600',subfolder="
 resultsNSS200_600 <- loadResults(dates1,folder='303NSS_Wind303_200_600',subfolder="results_DA")
 resultsSS300_900 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
 resultsNSS300_900 <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
-resultsSS500_1500 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
-resultsNSS500_1500 <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
+resultsSS500_1500 <-loadResults(dates1,folder='303SS_Wind303_500_1500',subfolder="results_DA")
+resultsNSS500_1500 <- loadResults(dates1,folder='303NSS_Wind303_500_1500',subfolder="results_DA")
 
 resultsSS50_50 <-loadResults(dates1,folder='303SS_Wind303_50_50',subfolder="results_DA")
 resultsNSS50_50 <- loadResults(dates1,folder='303NSS_Wind303_50_50',subfolder="results_DA")
+resultsSS100_100 <-loadResults(dates1,folder='303SS_Wind303_100_100',subfolder="results_DA")
+resultsNSS100_100 <- loadResults(dates1,folder='303NSS_Wind303_100_100',subfolder="results_DA")
+
 #resultsSS300_300 <-loadResults(dates1,folder='303SS_Wind303_300_300',subfolder="results_DA")
 #resultsNSS300_300 <- loadResults(dates1,folder='303NSS_Wind303_300_300',subfolder="results_DA")
 
 resultsSS300_2400 <-loadResults(dates1,folder='303SS_Wind303_300_2400',subfolder="results_DA")
 resultsNSS300_2400 <- loadResults(dates1,folder='303NSS_Wind303_300_2400',subfolder="results_DA")
 
+# list(resultsSS50_50,resultsNSS50_50)
 profitResultsPairs(list(list(resultsSS50_150,resultsNSS50_150),
                         list(resultsSS100_300,resultsNSS100_300),
                         list(resultsSS200_600,resultsNSS200_600),
                         list(resultsSS300_900,resultsNSS300_900),
-                        list(resultsSS50_50,resultsNSS50_50)),dates1)
+                        list(resultsSS500_1500,resultsNSS500_1500),
+                        list(resultsSS50_50,resultsNSS50_50),
+                        list(resultsSS100_100,resultsNSS100_100)),dates1)
 # end profit scatter
 #checker 
-clist <- list(cleanDispatchProfit(resultsNSS50_150,dates1),
-              cleanDispatchProfit(resultsSS50_150,dates1))
+clist <- list(cleanDispatchProfit(resultsNSS100_100,dates1),
+              cleanDispatchProfit(resultsSS100_100,dates1))
 names(clist) <- c("NSS","SS")
 totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
 

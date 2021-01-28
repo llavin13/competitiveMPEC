@@ -64,8 +64,13 @@ solver_name = "cplex"  # only change if you wish to use a solver other than cple
 solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
+<<<<<<< HEAD
     "simplex_tolerances_feasibility": 0.0001,
     "dettimelimit": 150000,
+=======
+    "simplex_tolerances_feasibility": 0.01,
+    "dettimelimit": 100000,
+>>>>>>> 0fc2bb057e3a036bded0708a083aff86faa40229
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
 ### OPTIONAL MODEL MODIFYING INPUTS ###
