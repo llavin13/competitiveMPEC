@@ -38,11 +38,11 @@ start_time = time.time()
 cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_1.16")
 
 ### GENERAL INPUTS ###
-case_folder = "303SS_Wind303_100_100"  # "Colocated303_303NSS"  #Wind303_2x303NSS
+case_folder = "303SS_Wind303_50_150"  # "Colocated303_303NSS"  #Wind303_2x303NSS
 
 # start from 7/1
-start_date = "01-01-2019"  # use this string format
-end_date = "02-01-2019"  # end date is exclusive
+start_date = "01-24-2019"  # use this string format
+end_date = "01-31-2019"  # end date is exclusive
 MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
 # the second value is how many tmps to subset RT cases into
@@ -64,12 +64,8 @@ solver_name = "cplex"  # only change if you wish to use a solver other than cple
 solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
-<<<<<<< HEAD
-    "simplex_tolerances_feasibility": 0.0001
-=======
-    "simplex_tolerances_feasibility": 0.00001,
+    "simplex_tolerances_feasibility": 0.01,
     "dettimelimit": 250000,
->>>>>>> 7b4f6ef4c2da80cb28709fbfe8bbf050f450999b
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
 ### OPTIONAL MODEL MODIFYING INPUTS ###
