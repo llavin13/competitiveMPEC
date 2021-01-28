@@ -41,7 +41,7 @@ start = datetime.datetime.strptime("01-01-2019", "%m-%d-%Y")  # day case starts 
 end = datetime.datetime.strptime(
     "02-01-2019", "%m-%d-%Y"
 )  # day case ends on. Generally this can be 01-01-2020.
-folder_out = "303SS_Wind303_300_900_uniformoffer"  # name of folder to write the case to
+folder_out = "303SS_Wind303_300_900_0minoffer"  # name of folder to write the case to
 
 # optional inputs for running
 # these define differences between cases
