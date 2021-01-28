@@ -1124,7 +1124,7 @@ profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitiv
   #then plotting
   ggplot(data=finaldf,aes(x=perMwhprofit,y=totalprofit/1000,color=hours)) +
     geom_point(aes(size=storagecapacity,shape=label)) +
-    scale_size_continuous(range = c(4, 12))+
+    scale_size_continuous(range = c(3, 12))+
     theme_classic() + ylab("Monthly Incremental ESR Profit ($K)") + xlab("Monthly Incremental ESR Profit ($/MWh dispatched)") +
     guides(color=guide_legend(title="ESR Duration (h)"),
            size=guide_legend(title="ESR Capacity (MW)"),
@@ -1199,23 +1199,8 @@ plotPrices(resultsDispatch,dates3,plotTitle='January prices')
 
 results1 <- loadResults(dates1,folder='NoStorageDispatch',subfolder="results_DA")
 results2 <- loadResults(dates3,folder='NoStorageDispatch',subfolder="results_DA_RTVRE")
-#results3 <- loadResults(dates1,folder="303.301SS_Wind303",subfolder="results_DA")
-#results1RT  <- loadResultsRT(dates1,folder='303.301SS_Wind303')
-d<-compareForecastErrors2(results1)
 
-results1$zonalLoadRT
-results1$nucoffer
-
-resultsA <-loadResults(dates1,folder='303NSS_Wind303_50_150',subfolder="results_DA")
-resultsB <- loadResults(dates1,folder='303SS_Wind303_50_150',subfolder="results_DA")
-
-resultsC <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
-resultsD <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
-resultsE <- loadResults(dates1,folder='303NSS_Wind303_300_900_DISPATCH',subfolder="results_DA")
-
-resultsF <- loadResults(dates1,folder='303SS_Wind303_100_300',subfolder="results_DA")
-
-###
+### profit scatter
 resultsSS50_150 <-loadResults(dates1,folder='303SS_Wind303_50_150',subfolder="results_DA")
 resultsNSS50_150 <- loadResults(dates1,folder='303NSS_Wind303_50_150',subfolder="results_DA")
 resultsSS100_300 <-loadResults(dates1,folder='303SS_Wind303_100_300',subfolder="results_DA")
@@ -1224,14 +1209,30 @@ resultsSS200_600 <-loadResults(dates1,folder='303SS_Wind303_200_600',subfolder="
 resultsNSS200_600 <- loadResults(dates1,folder='303NSS_Wind303_200_600',subfolder="results_DA")
 resultsSS300_900 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
 resultsNSS300_900 <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
+resultsSS500_1500 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
+resultsNSS500_1500 <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
 
 resultsSS50_50 <-loadResults(dates1,folder='303SS_Wind303_50_50',subfolder="results_DA")
 resultsNSS50_50 <- loadResults(dates1,folder='303NSS_Wind303_50_50',subfolder="results_DA")
-resultsSS300_300 <-loadResults(dates1,folder='303SS_Wind303_300_300',subfolder="results_DA")
-resultsNSS300_300 <- loadResults(dates1,folder='303NSS_Wind303_300_300',subfolder="results_DA")
+#resultsSS300_300 <-loadResults(dates1,folder='303SS_Wind303_300_300',subfolder="results_DA")
+#resultsNSS300_300 <- loadResults(dates1,folder='303NSS_Wind303_300_300',subfolder="results_DA")
 
 resultsSS300_2400 <-loadResults(dates1,folder='303SS_Wind303_300_2400',subfolder="results_DA")
 resultsNSS300_2400 <- loadResults(dates1,folder='303NSS_Wind303_300_2400',subfolder="results_DA")
+
+profitResultsPairs(list(list(resultsSS50_150,resultsNSS50_150),
+                        list(resultsSS100_300,resultsNSS100_300),
+                        list(resultsSS200_600,resultsNSS200_600),
+                        list(resultsSS300_900,resultsNSS300_900),
+                        list(resultsSS50_50,resultsNSS50_50)),dates1)
+# end profit scatter
+#checker 
+clist <- list(cleanDispatchProfit(resultsNSS50_150,dates1),
+              cleanDispatchProfit(resultsSS50_150,dates1))
+names(clist) <- c("NSS","SS")
+totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
+
+#end checker
 
 resultsSS300_900_DABIND <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_Bind_DA")
 resultsNSS300_900_RTVRE <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA_RTVRE")
@@ -1277,13 +1278,7 @@ names(clist) <- c("ESRonly","windtoo")
 totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
 
 
-profitResultsPairs(list(list(resultsSS50_150,resultsNSS50_150),
-                        list(resultsSS100_300,resultsNSS100_300),
-                        list(resultsSS200_600,resultsNSS200_600),
-                        list(resultsWINDSS300_900,resultsNSS300_900),
-                        list(resultsSS50_50,resultsNSS50_50),
-                        list(resultsSS300_300,resultsNSS300_300),
-                        list(resultsSS300_2400,resultsNSS300_2400)),dates1)
+
 
 #load/gen payment calcs
 caselist <- list(cleanDispatchCost(resultsSS300_900,dates1,type='lmp'),
