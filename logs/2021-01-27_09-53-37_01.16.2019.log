@@ -1,0 +1,189 @@
+Reading model...
+...model read.
+creating competitive generators file...
+...competitive generators recorded.
+Loading data...
+.. day-ahead data with real-time VRE data read.
+Compiling instance...
+...instance created.
+Creating Offer Mitigation (model will solve as dispatch if TRUE)...
+...storage offer mitigation file created
+LPStorage
+running bound DA offers as LP
+Solving...
+
+Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer 12.9.0.0
+  with Simplex, Mixed Integer & Barrier Optimizers
+5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21
+Copyright IBM Corp. 1988, 2019.  All Rights Reserved.
+
+Type 'help' for a list of available commands.
+Type 'help' followed by a command name for more
+information on commands.
+
+CPLEX> Logfile 'cplex.log' closed.
+Logfile 'C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmpid2h24u1.cplex.log' open.
+CPLEX> New value for parallel optimization mode: -1
+CPLEX> New value for mixed integer optimality gap tolerance: 0.01
+CPLEX> New value for feasibility tolerance: 1e-05
+CPLEX> New value for deterministic time limit in ticks: 250000
+CPLEX> Problem 'C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmpquq9uc95.pyomo.lp' read.
+Read time = 0.05 sec. (2.99 ticks)
+CPLEX> Problem name         : C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmpquq9uc95.pyomo.lp
+Objective sense      : Minimize
+Variables            :   25839  [Nneg: 889,  Box: 21470,  Free: 3480]
+Objective nonzeros   :    2544
+Linear constraints   :   27297  [Less: 13813,  Greater: 4416,  Equal: 9068]
+  Nonzeros           :   87372
+  RHS nonzeros       :   12174
+
+Variables            : Min LB: -5000.000        Max UB: 5000.000       
+Objective nonzeros   : Min   : 15.73158         Max   : 124.0997       
+Linear constraints   :
+  Nonzeros           : Min   : 0.8500000        Max   : 3000.000       
+  RHS nonzeros       : Min   : 0.1750000        Max   : 90000.00       
+CPLEX> CPXPARAM_Parallel                                -1
+CPXPARAM_Simplex_Tolerances_Feasibility          1.0000000000000001e-05
+CPXPARAM_DetTimeLimit                            250000
+CPXPARAM_MIP_Tolerances_MIPGap                   0.01
+Parallel mode: opportunistic, using up to 24 threads for concurrent optimization.
+Infeasible column 'x50436'.
+Presolve time = 0.00 sec. (3.76 ticks)
+Presolve - Infeasible.
+Solution time =    0.02 sec.
+Deterministic time = 3.76 ticks  (250.54 ticks/sec)
+CPLEX> CPLEX Error  1217: No solution exists.
+No file written.
+CPLEX> gap is infinite, so writing 0
+Exporting results... 
+ERROR exporting segmented generator offers! Check export_generator_segment_offer().
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 100, in __getitem__
+    return self._dict[id(obj)][1]
+KeyError: 2057888846088
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 93, in export_results
+    is_MPEC,
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 375, in export_generator_segment_offer
+    instance.LoadConstraint[t, instance.ZoneLabel[g]]
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 103, in __getitem__
+    % (id(obj), str(obj)))
+KeyError: "Component with id '2057888846088': LoadConstraint[1,301]"
+
+
+           Launching Python debugger (PDB)...
+           To execute multi-line statements in PDB, type this:
+                import code; code.interact(local=vars())
+           (The command launches an interactive Python session with all the local variables available.)
+           To exit the interactive session and continue script execution, press Ctrl+D.
+           
+> c:\programdata\anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py(103)__getitem__()
+-> % (id(obj), str(obj)))
+(Pdb) ERROR exporting NUC generator offers! Check export_nuc_generator_dispatch().
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 100, in __getitem__
+    return self._dict[id(obj)][1]
+KeyError: 2057888847912
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 101, in export_results
+    instance, timepoints_set, nuc_set, is_MPEC, results_directory
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 455, in export_nuc_generator_dispatch
+    instance.dual[instance.LoadConstraint[t, instance.ZoneLabel[g]]]
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 103, in __getitem__
+    % (id(obj), str(obj)))
+KeyError: "Component with id '2057888847912': LoadConstraint[1,320]"
+
+
+           Launching Python debugger (PDB)...
+           To execute multi-line statements in PDB, type this:
+                import code; code.interact(local=vars())
+           (The command launches an interactive Python session with all the local variables available.)
+           To exit the interactive session and continue script execution, press Ctrl+D.
+           
+> c:\programdata\anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py(103)__getitem__()
+-> % (id(obj), str(obj)))
+(Pdb) ERROR exporting transmission lines! Check export_lines().
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 100, in __getitem__
+    return self._dict[id(obj)][1]
+KeyError: 2057887691016
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 110, in export_results
+    instance, timepoints_set, transmission_lines_set, results_directory, is_MPEC
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 557, in export_lines
+    format_6f(instance.dual[instance.TxFromConstraint[t, line]])
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 103, in __getitem__
+    % (id(obj), str(obj)))
+KeyError: "Component with id '2057887691016': TxFromConstraint[1,C1]"
+
+
+           Launching Python debugger (PDB)...
+           To execute multi-line statements in PDB, type this:
+                import code; code.interact(local=vars())
+           (The command launches an interactive Python session with all the local variables available.)
+           To exit the interactive session and continue script execution, press Ctrl+D.
+           
+> c:\programdata\anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py(103)__getitem__()
+-> % (id(obj), str(obj)))
+(Pdb) ERROR exporting zonal prices! Check export_zonal_price().
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 100, in __getitem__
+    return self._dict[id(obj)][1]
+KeyError: 2057888846088
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 119, in export_results
+    instance, timepoints_set, zones_set, results_directory, is_MPEC
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 494, in export_zonal_price
+    format_6f(instance.dual[instance.LoadConstraint[t, z]])
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 103, in __getitem__
+    % (id(obj), str(obj)))
+KeyError: "Component with id '2057888846088': LoadConstraint[1,301]"
+
+
+           Launching Python debugger (PDB)...
+           To execute multi-line statements in PDB, type this:
+                import code; code.interact(local=vars())
+           (The command launches an interactive Python session with all the local variables available.)
+           To exit the interactive session and continue script execution, press Ctrl+D.
+           
+> c:\programdata\anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py(103)__getitem__()
+-> % (id(obj), str(obj)))
+(Pdb) ERROR exporting storage! Check export_storage().
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 100, in __getitem__
+    return self._dict[id(obj)][1]
+KeyError: 2057888846280
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 128, in export_results
+    instance, timepoints_set, storage_set, results_directory, is_MPEC
+  File "c:\Users\Luke\Desktop\competitiveMPEC_1.16\write_results_competitive.py", line 790, in export_storage
+    instance.LoadConstraint[t, instance.StorageZoneLabel[s]]
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py", line 103, in __getitem__
+    % (id(obj), str(obj)))
+KeyError: "Component with id '2057888846280': LoadConstraint[1,303]"
+
+
+           Launching Python debugger (PDB)...
+           To execute multi-line statements in PDB, type this:
+                import code; code.interact(local=vars())
+           (The command launches an interactive Python session with all the local variables available.)
+           To exit the interactive session and continue script execution, press Ctrl+D.
+           
+> c:\programdata\anaconda3\lib\site-packages\pyomo\core\kernel\component_map.py(103)__getitem__()
+-> % (id(obj), str(obj)))
+(Pdb) 

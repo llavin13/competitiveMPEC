@@ -35,7 +35,7 @@ from utility_functions import (
 )
 
 start_time = time.time()
-cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_dev1.27")
+cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_1.16")
 
 ### GENERAL INPUTS ###
 case_folder = "303SS_HYBRID_300_900"  # "Colocated303_303NSS"  #Wind303_2x303NSS
@@ -65,7 +65,7 @@ solver_kwargs = {
     "parallel": -1,
     "mip_tolerances_mipgap": 0.01,
     "simplex_tolerances_feasibility": 0.00001,
-    "dettimelimit": 50000,
+    "dettimelimit": 250000,
 }  # note if you use a non-cplex solver, you may have to change format of solver kwargs
 #    "warmstart_flag": True,
 ### OPTIONAL MODEL MODIFYING INPUTS ###

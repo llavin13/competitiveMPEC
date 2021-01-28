@@ -19,7 +19,7 @@ from case_creation_functions import write_RTS_case
 
 # create a file structure object, "f"
 folder_path = os.path.join(os.environ["HOMEPATH"], "Desktop")
-MPEC_folder_path = "competitiveMPEC_dev1.27"
+MPEC_folder_path = "competitiveMPEC_1.16"
 f = DirStructure(
     folder_path, RTS_folder="RTS-GMLC-master", MPEC_folder=MPEC_folder_path,
 )  # the first arg should be the local directory you put NREL-RTS in
