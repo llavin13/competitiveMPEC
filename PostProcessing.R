@@ -439,7 +439,7 @@ compareTotalGeneratorCost <- function(generatordflist,plotTitle='hi',resolution=
     generatordflist[[i]]$label <- names(generatordflist[i]) #may want better label
   }
   generatordf <- do.call("rbind", generatordflist)
-  
+  #print(generatordf)
   if (resolution=='month'){
     generatordf$date <- month(generatordf$date)
   }
@@ -833,12 +833,14 @@ plist <- list(pricesSS,pricesNSS)
 names(plist) <- c("A","B")
 f<-plotAllPrices(plist,"ESRonly303")
 
-dates3 <- seq(as.POSIXct("1/15/2019", format = "%m/%d/%Y"), by="day", length.out=7)
+dates3 <- seq(as.POSIXct("1/15/2019", format = "%m/%d/%Y"), by="day", length.out=5)
 resultsWINDSS300_900_dates3 <-loadResults(dates3,folder='303SS_Wind303_300_900',subfolder="results_DA")
 resultsWINDNSS300_900_dates3 <- loadResults(dates3,folder='303NSS_Wind303_300_900',subfolder="results_DA")
+resultsWINDSS300_900_MITIGATE <- loadResults(dates3,folder="303SS_Wind303_300_900",subfolder = "results_DA_Mitigated")
 
 pricesWINDSS <- plotPrices(resultsWINDSS300_900_dates3,dates3,plotTitle='SSJan')
 pricesWINDNSS <- plotPrices(resultsWINDNSS300_900_dates3,dates3,plotTitle='NSSJan')
+pricesWINDSSMITIGATE <- plotPrices(resultsWINDSS300_900_MITIGATE,dates3,plotTitle="mitigateJan")
 plistWIND <- list(pricesWINDSS,pricesWINDNSS,pricesWINDNSS)
 names(plistWIND) <- c("A","B","C")
 f2<-plotAllPrices(plistWIND,"ESRandWind303",busIDlist = list("03","03","13"))
@@ -1065,11 +1067,22 @@ LoadWindScatter <- function(rlist,rlistcompared){
   return(vals)
 }
 
-profitResultsPairs <- function(pairlist, dates, labels=c("SS","NSS")){
-  
+profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitive")){
+  objectivelist <- c()
   for (i in 1:length(pairlist)){
     strategic <- pairlist[[i]][[1]]
+    
     nonstrategic <- pairlist[[i]][[2]]
+    
+    #first grab objective-related values
+    strategic$objective$label <- labels[[1]]
+    nonstrategic$objective$label <- labels[[2]]
+    objectivedf <- rbind(strategic$objective,nonstrategic$objective)
+    gapdf <- ddply(objectivedf, ~ label,summarise, Gap = sum(gap))
+    #print(gapdf)
+    objectivelist <- c(objectivelist,gapdf$Gap)
+
+    
     clist <- list(cleanDispatchProfit(strategic,dates,overwrite_gen="303_WIND_1"), cleanDispatchProfit(nonstrategic,dates,overwrite_gen="303_WIND_1"))
     slist <- list(plotStorage(strategic,dates,plotTitle='1'),
                   plotStorage(nonstrategic,dates,plotTitle='1'))
@@ -1097,22 +1110,25 @@ profitResultsPairs <- function(pairlist, dates, labels=c("SS","NSS")){
     }
     print(finaldf)
   }
+
   #eventually format dataframe
   #profitdf <- do.call("rbind", caselist)
   finaldf$hours <- as.character(finaldf$storageduration/finaldf$storagecapacity)
-  finaldf$perMwhprofit <- finaldf$deltaprofit/(finaldf$storageduration)
+  finaldf$perMwhprofit <- finaldf$deltaprofit/(finaldf$storageduration*31)
+  #$perMWhprofit <- finaldf$perMWhprofit/31 #for now but change 
   finaldf$storagecapacity <- as.numeric(finaldf$storagecapacity)
   finaldf$hourlabel <- paste(finaldf$hour,finaldf$label,sep="_")
   
+  #geom_line(aes(group = hourlabel, linetype=label))+
+  #scale_linetype_manual(values=c("solid","dashed"))+
   #then plotting
   ggplot(data=finaldf,aes(x=perMwhprofit,y=totalprofit/1000,color=hours)) +
-    geom_point(aes(size=storagecapacity)) +
-    geom_line(aes(group = hourlabel, linetype=label))+
-    scale_linetype_manual(values=c("solid","dashed"))+
-    theme_classic() + ylab("Monthly Profit ($K)") + xlab("Monthly Profit ($/MWh-installed)") +
+    geom_point(aes(size=storagecapacity,shape=label)) +
+    scale_size_continuous(range = c(4, 12))+
+    theme_classic() + ylab("Monthly Incremental ESR Profit ($K)") + xlab("Monthly Incremental ESR Profit ($/MWh dispatched)") +
     guides(color=guide_legend(title="ESR Duration (h)"),
            size=guide_legend(title="ESR Capacity (MW)"),
-           linetype=guide_legend(title="Ownership")) +
+           shape=guide_legend(title="ESR Bidding")) +
     theme(legend.title = element_text(size=20),
           legend.text = element_text(size=20),
           legend.position = 'right',
@@ -1127,15 +1143,29 @@ profitResultsPairs <- function(pairlist, dates, labels=c("SS","NSS")){
   
   #try also a grouped stacked barplot
   melted <- finaldf[,c("label","profit","storageprofit")]
-  colnames(melted) <- c("label","Wind","Storage")
-  melted$cat <- c("RT Perfect Foresight","RT Perfect Foresight","RT DA Bid Bound","RT DA Bid Bound")
-  melted <- melt(melted, id.vars=c("label","cat"))
-  melted$label <- ifelse(melted$label=="NSS","ISO Dispatch","Strategic ESR Bids")
+  colnames(melted) <- c("label","Wind","ESR")
   
-  ggplot(melted, aes(x = label, y = value/1000, fill = variable)) + 
+  melted$cat <- c("Case A: ESR Only","Case A: ESR Only","Case B: ESR+Wind","Case B: ESR+Wind")
+  #melted$cat <- c("Case B: RT Perfect Foresight","Case B: RT Perfect Foresight","Case B: RT Uncertainty","Case B: RT Uncertainty")
+  
+  melted <- melt(melted, id.vars=c("label","cat"))
+  melted$label <- ifelse(melted$label=="Competitive","Competitive","Strategic ESR Bids")
+  
+  melted$Gap <- objectivelist
+  melted$Gap <- melted$Gap*.001
+  melted$value <- melted$value*.001
+  
+  melted$Gap[melted$label=="Competitive"] <- 0#competitive is LP so ovewrite gap as 0
+  #adjust positioning
+  grouped_melt <- melted %>% group_by(cat,label) %>% summarise(totalvalue=sum(value))
+  melted$totalvalue <- rep(grouped_melt$totalvalue,2)
+  print(melted)
+  
+  ggplot(melted, aes(x = label, y = value, fill = variable)) +
     geom_bar(stat = 'identity', position = 'stack',alpha=.7) +
+    geom_errorbar(aes(x=label, ymin=totalvalue-Gap, ymax=totalvalue+Gap),position='identity', colour="black")+
     facet_grid(~ cat) + theme_classic()+ ylab("Monthly Profit ($K)") +
-    xlab("") + scale_fill_manual(values=c("cyan","gold"))+
+    xlab("") + scale_fill_manual(values=c("cyan","grey"))+
     guides(fill=guide_legend(title="Generator Profit")) +
     theme(legend.title = element_text(size=20),
           legend.text = element_text(size=20),
@@ -1154,7 +1184,7 @@ profitResultsPairs <- function(pairlist, dates, labels=c("SS","NSS")){
 
 }
 profitResultsPairs(list(list(resultsSS300_900,resultsNSS300_900),
-                        list(resultsSS300_900_DABIND,resutlsNSS300_900_RTVRE)),
+                        list(resultsWINDSS300_900,resultsNSS300_900)),
                    dates1)
 
 a<-LoadWindScatter(resultsD,list(resultsC,resultsC,resultsF))
@@ -1203,9 +1233,9 @@ resultsNSS300_300 <- loadResults(dates1,folder='303NSS_Wind303_300_300',subfolde
 resultsSS300_2400 <-loadResults(dates1,folder='303SS_Wind303_300_2400',subfolder="results_DA")
 resultsNSS300_2400 <- loadResults(dates1,folder='303NSS_Wind303_300_2400',subfolder="results_DA")
 
-resultsSS300_900_DABIND <- loadResults(dates3,folder='303SS_Wind303_300_900',subfolder="results_Bind_DA")
-resultsNSS300_900_RTVRE <- loadResults(dates3,folder='303NSS_Wind303_300_900',subfolder="results_DA_RTVRE")
-resultsSS300_900_RTVRE <- loadResults(dates3,folder='303SS_Wind303_300_900',subfolder="results_DA_RTVRE")
+resultsSS300_900_DABIND <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_Bind_DA")
+resultsNSS300_900_RTVRE <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA_RTVRE")
+resultsSS300_900_RTVRE <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA_RTVRE")
 
 slist <- list(plotStorage(resultsNSS300_900_RTVRE,dates1,plotTitle='1'),
               plotStorage(resultsSS300_900_DABIND,dates1,plotTitle='1'),
@@ -1224,10 +1254,15 @@ profitResultsPairs(list(list(resultsSS300_900_RTVRE,resultsNSS300_900_RTVRE),
                         list(resultsSS300_900_DABIND,resultsNSS300_900_RTVRE)),
                     dates1)
 
-resultsSS300_900 <-loadResults(dates3,folder='303SS_300_900',subfolder="results_DA")
-resultsWINDSS300_900 <-loadResults(dates3,folder='303SS_Wind303_300_900',subfolder="results_DA")
-resultsNSS300_900 <- loadResults(dates3,folder='303NSS_Wind303_300_900',subfolder="results_DA")
 
+mean(resultsSS300_900$nucoffer$capacity[grepl("303_WIND",resultsSS300_900$nucoffer$X)]) #calculates wind avg gen
+
+resultsSS300_900 <-loadResults(dates1,folder='303SS_300_900',subfolder="results_DA")
+resultsWINDSS300_900 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
+resultsNSS300_900 <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA")
+resultsWINDSS300_900_MITIGATE <- loadResults(dates3,folder="303SS_Wind303_300_900",subfolder = "results_DA_Mitigated")
+
+LoadWindScatter(resultsNSS300_900,list(resultsWINDSS300_900))
 profitResultsPairs(list(list(resultsWINDSS300_900,resultsNSS300_900),
                         list(resultsSS300_900,resultsNSS300_900)),
                    dates1)
@@ -1236,129 +1271,34 @@ slist <- list(plotStorage(resultsSS300_900,dates1,plotTitle='1'),
 names(slist) <- c("ESRonly","windtoo")
 esrprofits <- compareStorageProfit(slist,plotTitle=" ",resolution="")
 
+clist <- list(cleanDispatchProfit(resultsSS300_900,dates1, overwrite_gen="303_WIND_1"),
+              cleanDispatchProfit(resultsWINDSS300_900,dates1))
+names(clist) <- c("ESRonly","windtoo")
+totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
+
+
 profitResultsPairs(list(list(resultsSS50_150,resultsNSS50_150),
                         list(resultsSS100_300,resultsNSS100_300),
                         list(resultsSS200_600,resultsNSS200_600),
-                        list(resultsSS300_900,resultsNSS300_900),
+                        list(resultsWINDSS300_900,resultsNSS300_900),
                         list(resultsSS50_50,resultsNSS50_50),
                         list(resultsSS300_300,resultsNSS300_300),
                         list(resultsSS300_2400,resultsNSS300_2400)),dates1)
 
+#load/gen payment calcs
+caselist <- list(cleanDispatchCost(resultsSS300_900,dates1,type='lmp'),
+                 cleanDispatchCost(resultsWINDSS300_900,dates1,type='lmp'),
+                 cleanDispatchCost(resultsNSS300_900,dates1,type="lmp"))
+names(caselist) <- c("SS","SSWIND","NSS")
+compareTotalGeneratorCost(caselist,plotTitle='JanPmt',resolution='month')
 
-#scatterplot thermal gen against Wind 303
-#label 
+#storage
+SS <- plotStorage(resultsSS300_900,plotTitle="SS")
+SS <- SS %>% group_by(X,hour,date) %>% summarise(profit=sum(profit))
+sum(SS$profit[SS$profit>0])
+sum(SS$profit[SS$profit<0])
 
-d1 <- plotDispatch(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
-d2 <- plotPrices(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
-d3 <- plotStorage(results1,dates1,plotTitle='Jan 1 2019 RTVRE')
-
-d1bind <- plotDispatch(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
-d2bind <- plotPrices(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
-d3bind <- plotStorage(results2,dates1,plotTitle='Jan 1 2019 BIND DA')
-
-#d1RT <- plotDispatch(results1RT,dates1,plotTitle='Jan 1 2019 RT')
-#d2RT <- plotPrices(results1RT,dates1,plotTitle='Jan 1 2019 RT')
-#d3RT <- plotStorage(results1RT,dates1,plotTitle='Jan 1 2019 RT')
-
-#compareplotDispatch(d1,d1RT)
-#compareplotPrices(d2,d2RT)
-#compareplotStorage(d3,d3RT)
-
-caselist <- list(d3,d3bind)
-names(caselist) <- c('day-ahead','real-time')
-compareStorageHeatplot(caselist)
-compareStorageHeatplot(caselist,type='lmp')
-compareStorageProfit(caselist,plotTitle='test',resolution='month')
-
-caselist <- list(cleanDispatchCost(results1,dates1),cleanDispatchCost(results2,dates1))
-names(caselist) <- c('day-ahead','real-time')
-compareTotalGeneratorCost(caselist,plotTitle='test',resolution='month')
-
-
-
-
-### end
-
-### old code function examples
-
-## January only ##
-datesJan <- seq(as.POSIXct("1/3/2019", format = "%m/%d/%Y"), by="day", length.out=2)#31
-
-nostorageJan <- loadAllCases(datesJan,folder='NoStorage')
-baseJan <- loadAllCases(datesJan,folder='base')
-competitiveJan <- loadAllCases(datesJan,folder="competitive")
-baseCO2Jan <- loadAllCases(datesJan,folder='baseCO230')
-competitiveCO2Jan <- loadAllCases(datesJan,folder='competitiveCO230')
-competitiveCCJan <- loadAllCases(datesJan,folder='competitive300CCs')
-competitiveSteamJan <- loadAllCases(datesJan,folder='competitive300STEAM')
-
-base303Jan <- loadAllCases(datesJan,folder='BaseStorageBus303')
-base309Jan <- loadAllCases(datesJan,folder='BaseStorageBus309')
-competitive303Jan <- loadAllCases(datesJan,folder='CompetitiveStorageBus303')
-competitive309Jan <- loadAllCases(datesJan,folder='CompetitiveStorageBus309')
-competitive303andWind309Jan <- loadAllCases(datesJan,folder='CompetitiveStorageBus303andWind309')
-
-#storage-related plots
-#nostorageJan,baseJan,competitiveJan,baseCO2Jan,
-#competitiveCO2Jan,competitiveCCJan,competitiveSteamJan
-
-caselist <- list(plotStorage(nostorageJan,datesJan,plotTitle='1'),
-                 plotStorage(baseJan,datesJan,plotTitle='2'),
-                 plotStorage(competitiveJan,datesJan,plotTitle='3'),
-                 plotStorage(base303Jan,datesJan,plotTitle='8'),
-                 plotStorage(base309Jan,datesJan,plotTitle='9'),
-                 plotStorage(competitive303Jan,datesJan,plotTitle='10'),
-                 plotStorage(competitive309Jan,datesJan,plotTitle='11'),
-                 plotStorage(competitive303andWind309Jan,datesJan,plotTitle='12'))
-names(caselist) <- c('NoStorage','Base313','Comp313',
-                     'Base303','Base309','Comp303','Comp309',
-                     'Comp303Wind309')
-
-compareStorageProfit(caselist,plotTitle='Jan 3-4th',resolution='na')#resolution='month'
-compareStorageHeatplot(caselist,plotTitle='Jan 4th')
-compareStorageHeatplot(caselist,plotTitle='Jan',type='lmp')
-
-#lmp-related plots
-
-#generator cost, revenue, and profit
-#cost
-myfilter ='None'#316_STEAM_1#309_WIND_1
-caselist <- list(cleanDispatchCost(nostorageJan,datesJan,filter=myfilter),
-                 cleanDispatchCost(baseJan,datesJan,filter=myfilter),
-                 cleanDispatchCost(competitiveJan,datesJan,filter=myfilter),
-                 cleanDispatchCost(base303Jan,datesJan,filter=myfilter),
-                 cleanDispatchCost(base309Jan,datesJan,filter=myfilter),
-                 cleanDispatchCost(competitive303Jan,datesJan,filter=myfilter),
-                 cleanDispatchCost(competitive309Jan,datesJan,filter=myfilter),
-                 cleanDispatchCost(competitive303andWind309Jan,datesJan,filter=myfilter))
-names(caselist) <- c('NoStorage','Base','Competitive','Base303','Base309',
-                     'Competitive303','Competitive309','Competitive303andWind309')
-compareTotalGeneratorCost(caselist,plotTitle='JanCost',resolution='na')#resolution='month'
-
-#payments
-#cleanDispatchCost(baseCO2Jan,datesJan,type='lmp')#filter='316_STEAM_1'
-myfilter='309_WIND_1'
-caselist <- list(cleanDispatchCost(nostorageJan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(baseJan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(competitiveJan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(base303Jan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(base309Jan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(competitive303Jan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(competitive309Jan,datesJan,type='lmp',filter=myfilter),
-                 cleanDispatchCost(competitive303andWind309Jan,datesJan,type='lmp',filter=myfilter))
-names(caselist) <- c('NoStorage','Base313','Comp313','Base303','Base309',
-                     'Comp303','Comp309','Comp303Wind309')
-compareTotalGeneratorCost(caselist,plotTitle='JanPmt',resolution='m')#resoultion='month'
-#require(scales)
-#emissions
-caselist <- list(cleanEmissions(nostorageJan,datesJan),
-                 cleanEmissions(baseJan,datesJan),
-                 cleanEmissions(competitiveJan,datesJan),
-                 cleanEmissions(base303Jan,datesJan),
-                 cleanEmissions(base309Jan,datesJan),
-                 cleanEmissions(competitive303Jan,datesJan),
-                 cleanEmissions(competitive309Jan,datesJan),
-                 cleanEmissions(competitive303andWind309Jan,datesJan))
-names(caselist) <- c('NoStorage','Base313','Comp313','Base303','Base309',
-                     'Comp303','Comp309','Comp303Wind309')
-compareTotalEmissions(caselist,plotTitle='Jan',resolution='m')
+NSS <- plotStorage(resultsNSS300_900,plotTitle="NSS")
+NSS <- NSS %>% group_by(X,hour,date) %>% summarise(profit=sum(profit))
+sum(NSS$profit[NSS$profit>0])
+sum(NSS$profit[NSS$profit<0])

@@ -41,7 +41,7 @@ start = datetime.datetime.strptime("01-01-2019", "%m-%d-%Y")  # day case starts 
 end = datetime.datetime.strptime(
     "02-01-2019", "%m-%d-%Y"
 )  # day case ends on. Generally this can be 01-01-2020.
-folder_out = "303NSS_300_900"  # name of folder to write the case to
+folder_out = "303SS_Wind303_300_900_uniformoffer"  # name of folder to write the case to
 
 # optional inputs for running
 # these define differences between cases
@@ -60,8 +60,8 @@ optional_args = {
         "PV",
         "CSP",
     ],
-    "owned_gens": [],
-    "owned_storage": [],
+    "owned_gens": ["303_WIND_1"],
+    "owned_storage": ["313_STORAGE_1"],
     "hybrid_gens": [],
     "hybrid_storage": [],
     "retained_buses": [

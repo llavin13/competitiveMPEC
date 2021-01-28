@@ -479,7 +479,7 @@ dispatch_model.gensegmentmax_dual = Var(
     dispatch_model.GENERATORSEGMENTS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.gensegmentmin_dual = Var(
@@ -488,7 +488,7 @@ dispatch_model.gensegmentmin_dual = Var(
     dispatch_model.GENERATORSEGMENTS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.transmissionmax_dual = Var(
@@ -496,7 +496,7 @@ dispatch_model.transmissionmax_dual = Var(
     dispatch_model.TRANSMISSION_LINE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.transmissionmin_dual = Var(
@@ -504,7 +504,7 @@ dispatch_model.transmissionmin_dual = Var(
     dispatch_model.TRANSMISSION_LINE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.socmax_dual = Var(
@@ -512,7 +512,7 @@ dispatch_model.socmax_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.socmin_dual = Var(
@@ -520,7 +520,7 @@ dispatch_model.socmin_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.rampmax_dual = Var(
@@ -528,7 +528,7 @@ dispatch_model.rampmax_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.rampmin_dual = Var(
@@ -536,7 +536,7 @@ dispatch_model.rampmin_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.voltageanglemax_dual = Var(
@@ -544,7 +544,7 @@ dispatch_model.voltageanglemax_dual = Var(
     dispatch_model.ZONES,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.voltageanglemin_dual = Var(
@@ -552,7 +552,7 @@ dispatch_model.voltageanglemin_dual = Var(
     dispatch_model.ZONES,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.storagetight_dual = Var(
@@ -560,7 +560,7 @@ dispatch_model.storagetight_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 50),
+    bounds=(0, 5),
 )
 
 dispatch_model.chargemin_dual = Var(
@@ -568,7 +568,7 @@ dispatch_model.chargemin_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.dischargemin_dual = Var(
@@ -576,31 +576,31 @@ dispatch_model.dischargemin_dual = Var(
     dispatch_model.STORAGE,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.finalsoc_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 350),
 )
 
 dispatch_model.finalsocmax_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 350),
 )
 
 dispatch_model.finalsocmin_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 350),
 )
 
 dispatch_model.onecycle_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 350),
 )
 
 dispatch_model.bindonecyclemax_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 350),
 )
 
 dispatch_model.bindonecyclemin_dual = Var(
-    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 5000),
+    dispatch_model.STORAGE, within=NonNegativeReals, initialize=0, bounds=(0, 350),
 )
 
 dispatch_model.gendispatchmax_dual = Var(
@@ -608,7 +608,7 @@ dispatch_model.gendispatchmax_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.gendispatchmin_dual = Var(
@@ -616,7 +616,7 @@ dispatch_model.gendispatchmin_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.startupshutdown_dual = Var(
@@ -624,7 +624,7 @@ dispatch_model.startupshutdown_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.nucdispatchmax_dual = Var(
@@ -632,7 +632,7 @@ dispatch_model.nucdispatchmax_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 dispatch_model.nucdispatchmin_dual = Var(
@@ -640,7 +640,7 @@ dispatch_model.nucdispatchmin_dual = Var(
     dispatch_model.GENERATORS,
     within=NonNegativeReals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(0, 350),
 )
 
 # offer-related variables (since generators no longer just offer at marginal cost)
@@ -655,16 +655,10 @@ dispatch_model.go = Var(
     dispatch_model.ACTIVETIMEPOINTS, dispatch_model.GENERATORS, within=NonNegativeReals
 )
 
-dispatch_model.sodischarge = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=Reals,
-    initialize=0,
-    bounds=(-50, 5000),
+dispatch_model.sodischarge = Var(dispatch_model.STORAGE, within=Reals,
 )
 
-dispatch_model.socharge = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=Reals,
-    initialize=0,
-    bounds=(-50, 5000),
+dispatch_model.socharge = Var(dispatch_model.STORAGE, within=Reals,
 )
 
 
@@ -799,7 +793,7 @@ def REOfferCap(model, t, g):
     if g in model.HYBRID_GENS:
         for s in model.HYBRID_STORAGE:
             if model.ZoneLabel[g] == model.StorageZoneLabel[s]:
-                return model.go[t,g] == model.sodischarge[t, s]
+                return model.go[t,g] == model.sodischarge[s]
         return Constraint.Skip
     elif g in model.NUC_GENS:
         return model.go[t, g] == 0.0
@@ -816,7 +810,7 @@ dispatch_model.REOfferCapConstraint = Constraint(
 # added by Luke 6.30.20
 # will eventually want to move lower down with other upper-level offer mitigation constraints
 def MitigateChargeOffer(model, t, s):
-    return model.ChargeMaxOffer[t, s] >= model.socharge[t, s]
+    return model.ChargeMaxOffer[t, s] >= model.socharge[s]
 
 
 dispatch_model.MitigateChargeOfferConstraint = Constraint(
@@ -825,7 +819,7 @@ dispatch_model.MitigateChargeOfferConstraint = Constraint(
 
 
 def MitigateDischargeOffer(model, t, s):
-    return model.DischargeMaxOffer[t, s] >= model.sodischarge[t, s]
+    return model.DischargeMaxOffer[t, s] >= model.sodischarge[s]
 
 
 dispatch_model.MitigateDischargeOfferConstraint = Constraint(
@@ -837,7 +831,7 @@ def ForceBindDischargeOffer(model, t, s):
     """This constraint should only be active in RT cases, and only when user select it to be active
     It FORCES RT offers to equal DA offers from previously run case
     """
-    return model.DischargeOffer[t, s] == model.sodischarge[t, s]
+    return model.DischargeOffer[t, s] == model.sodischarge[s]
 
 
 dispatch_model.ForceBindDischargeOfferConstraint = Constraint(
@@ -851,7 +845,7 @@ def ForceBindChargeOffer(model, t, s):
     """This constraint should only be active in RT cases, and only when user select it to be active
     It FORCES RT offers to equal DA offers from previously run case
     """
-    return model.ChargeOffer[t, s] == model.socharge[t, s]
+    return model.ChargeOffer[t, s] == model.socharge[s]
 
 
 dispatch_model.ForceBindChargeOfferConstraint = Constraint(
@@ -860,7 +854,7 @@ dispatch_model.ForceBindChargeOfferConstraint = Constraint(
 
 
 def DischargeOfferExceedsChargeOffer(model, t, s):
-    return model.sodischarge[t, s] >= model.socharge[t, s]
+    return model.sodischarge[s] >= model.socharge[s]
 
 
 #dispatch_model.StorageOfferConstraint = Constraint(
@@ -1469,7 +1463,7 @@ def BindStorageDischargeDual(model, t, s):
     """
     
     return (
-        model.sodischarge[t, s]
+        model.sodischarge[s]
         + model.ChargeMax[s] * model.storagetight_dual[t, s]
         - model.dischargemin_dual[t, s]
         - sum(
@@ -1503,7 +1497,7 @@ def RTBindStorageDischargeDual(model, t, s):
         s {str} -- storage index
     """
     return (
-        model.sodischarge[t, s]
+        model.sodischarge[s]
         + model.ChargeMax[s] * model.storagetight_dual[t, s]
         - model.dischargemin_dual[t, s]
         - sum(
@@ -1540,7 +1534,7 @@ def BindStorageChargeDual(model, t, s):
         s {str} -- storage index
     """
     return (
-        -model.socharge[t, s]
+        -model.socharge[s]
         + model.DischargeMax[s] * model.storagetight_dual[t, s]
         - model.chargemin_dual[t, s]
         + sum(
@@ -1570,7 +1564,7 @@ def RTBindStorageChargeDual(model, t, s):
         s {str} -- storage index
     """
     return (
-        -model.socharge[t, s]
+        -model.socharge[s]
         + model.DischargeMax[s] * model.storagetight_dual[t, s]
         - model.chargemin_dual[t, s]
         + sum(
