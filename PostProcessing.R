@@ -98,6 +98,8 @@ loadResults <- function(dates,folder,subfolder){
   modelLMP <- AddDatetime(modelLMP)
   storage <- AddDatetime(storage)
   dispatch <- AddDatetime(dispatch)
+  offer <- AddDatetime(offer)
+  nucoffer <- AddDatetime(nucoffer)
   
   # return results
   results <- list(modelLMP, zonalLoad,zonalLoadRT, dispatch, gens, txFlows, storage, offer, nucoffer, storageresources, generatorresources, objective,
@@ -593,7 +595,6 @@ compareStorageHeatplot <- function(storagedflist,plotTitle='NA',type='NA'){
 
 compareStorageProfit <- function(storagedflist,plotTitle='hi',resolution='NA'){
   
-  
   #ss <- results1$storageresources$Storage_Index[results1$storageresources$StorageIndex == 1]
   #eventually probably a list of dfs as input
   for (i in 1:length(storagedflist)){
@@ -630,6 +631,60 @@ compareStorageProfit <- function(storagedflist,plotTitle='hi',resolution='NA'){
   setwd(paste(baseWD, "post_processing", "figures", sep="/"))
   ggsave(paste0("storage profit plot",plotTitle,".png"), width=12, height=6)
   return(storagedf)
+}
+
+compareStorageOffer <- function(storagedflist, generatordflist, match,plotTitle="hi"){
+  for (i in 1:length(generatordflist)){
+    generatordflist[[i]]$label <- names(generatordflist[i])
+  }
+  generatordf <- do.call("rbind",generatordflist)
+  generatordf <- generatordf[,c("X","datetime","SegmentOffer","label")]
+  names(generatordf)[names(generatordf)=="SegmentOffer"] <- "offer"
+  for (i in 1:length(storagedflist)){
+    #storagedflist[[i]] <- storagedflist[[i]][storagedflist[[i]]$X==ss,]
+    storagedflist[[i]]$label <- names(storagedflist[i]) #may want better label
+  }
+  storagedf <- do.call("rbind", storagedflist)
+  dischargedf <- storagedf[,c("X","datetime","discharge_offer","lmp","label")]
+  names(dischargedf)[names(dischargedf) == "discharge_offer"] <- "offer"
+  dischargedf$case <- "ESR Discharge Offer"
+  #dischargedf$label <- paste(dischargedf$label,"Discharge",sep=" ")
+  
+  
+  chargedf <- storagedf[,c("X","datetime","charge_offer","lmp","label")]
+  names(chargedf)[names(chargedf) == "charge_offer"] <- "offer"
+  chargedf$case <- "ESR Charge Offer"
+  #chargedf$label <- paste(chargedf$label,"Charge",sep=" ")
+  
+  #chargedf <- storagedf
+  #clip and re-stack the df so charge and discharge are melted
+  stacked_storagedf <- rbind(chargedf,dischargedf)
+  print(stacked_storagedf)
+  #some helpful stuff for plotting, for now
+  #ylim(c(0,30))
+  plotcolors <- c("blue","black","grey","red")
+  plotlines <- c("dotted","dotted","solid","solid")
+  ggplot(data=stacked_storagedf, aes(x=datetime, y=offer, color=label)) + geom_line(lwd=2) +
+    geom_line(data=stacked_storagedf[stacked_storagedf$label==match,],aes(x=datetime,y=lmp),color="red",linetype="dashed",lwd=2, inherit.aes=F)+
+    facet_wrap(~case,nrow=1)+theme_classic() + ylab("$/MWh") + xlab("") +ylim(c(0,30))+
+    scale_color_manual(values = plotcolors) +
+    scale_linetype_manual(values=plotlines) +
+    guides(colour=guide_legend(title="", nrow=2))+
+    theme(legend.text = element_text(size=34),
+          legend.title = element_text(size=30),
+          legend.position = "bottom",
+          plot.title = element_blank(),
+          axis.title.y = element_text(size=40),
+          axis.text.x= element_text(size=16),
+          axis.text.y= element_text(size=32),
+          strip.text.x=element_text(size=24))
+  
+  #truncate axes for offers at some reasonable upper bound to cut off unacceptable offers
+  
+  #write to folder
+  setwd(paste(baseWD, "post_processing", "figures", sep="/"))
+  ggsave(paste0("OfferPlot",plotTitle,".png"), width=12, height=6)
+  return("hi!")
 }
 
 cleanOffer <- function(results,dates,hours=24){
@@ -717,17 +772,19 @@ cleanDispatchCost <- function(results,dates,type='NA',filter='None',hour=24){
 }
 
 
-cleanDispatchProfit <- function(results,dates,type='NA',filter='None',overwrite_gen="None",hour=24){
+cleanDispatchProfit <- function(results,dates,type='NA',filter='None',overwrite_gen="None",returntype="NA",hour=24){
+  
   gc <- results[['generatorresources']]$Gen_Index[results[['generatorresources']]$GencoIndex == 1]
   offer <- results[['offer']]
-  offer <- offer[,c("X","SegmentDispatch","LMP","date")]
-  
+  offer <- offer[,c("X","SegmentDispatch","LMP","date","SegmentOffer","datetime")]
   nucoffer <- results[['nucoffer']]
-  nucoffer <- nucoffer[,c("X","dispatch","lmp","date")]
-  colnames(nucoffer)=c("X","SegmentDispatch","LMP","date")
+  nucoffer <- nucoffer[,c("X","dispatch","lmp","date","offer","datetime")]
+  
+  colnames(nucoffer)=c("X","SegmentDispatch","LMP","date","SegmentOffer","datetime")
   offer <- rbind(offer, nucoffer)
   offer$segID <- gsub("[[:print:]]*-", "", offer[,1])
   offer$genID <- gsub("-\\d+","",offer[,1])
+  
   if (overwrite_gen=="None"){
     offer <- offer[offer$genID==gc,]
   }
@@ -738,8 +795,16 @@ cleanDispatchProfit <- function(results,dates,type='NA',filter='None',overwrite_
   if (filter!='None'){
     offer <- offer[offer$genID==filter,]
   }
+  offer$hour <- hour(offer$datetime)
+  offer <- ddply(offer,~date+hour,summarise,dispatchprofit=mean(dispatchprofit))
   DispatchProfit <- ddply(offer,~date,summarise,Profit=sum(dispatchprofit))
-  return(DispatchProfit)
+
+  if (returntype!="NA"){
+    return(offer)
+  }
+  else{
+    return(DispatchProfit)
+  }
 }
 
 compareObjectives <- function(resultslist){
@@ -1067,7 +1132,7 @@ LoadWindScatter <- function(rlist,rlistcompared){
   return(vals)
 }
 
-profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitive")){
+profitResultsPairs <- function(pairlist, dates, barTitle="",labels=c("Strategic","Competitive")){
   objectivelist <- c()
   for (i in 1:length(pairlist)){
     strategic <- pairlist[[i]][[1]]
@@ -1122,13 +1187,15 @@ profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitiv
   #geom_line(aes(group = hourlabel, linetype=label))+
   #scale_linetype_manual(values=c("solid","dashed"))+
   #then plotting
+  #guides(shape = guide_legend(override.aes = list(size = 5)))
   ggplot(data=finaldf,aes(x=perMwhprofit,y=totalprofit/1000,color=hours)) +
     geom_point(aes(size=storagecapacity,shape=label)) +
     scale_size_continuous(range = c(3, 12))+
-    theme_classic() + ylab("Monthly Incremental ESR Profit ($K)") + xlab("Monthly Incremental ESR Profit ($/MWh dispatched)") +
-    guides(color=guide_legend(title="ESR Duration (h)"),
+    ylim(c(0,2000))+theme_classic() +
+    ylab("Monthly Incremental ESR Profit ($K)") + xlab("Monthly Incremental ESR Profit ($/MWh dispatched)") +
+    guides(color=guide_legend(title="ESR Duration (h)", override.aes = list(size = 9)),
            size=guide_legend(title="ESR Capacity (MW)"),
-           shape=guide_legend(title="ESR Bidding")) +
+           shape=guide_legend(title="ESR Bidding", override.aes = list(size = 9))) +
     theme(legend.title = element_text(size=20),
           legend.text = element_text(size=20),
           legend.position = 'right',
@@ -1136,7 +1203,8 @@ profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitiv
           axis.title.y = element_text(size=24),
           axis.title.x = element_text(size=24),
           axis.text.x= element_text(size=20),
-          axis.text.y= element_text(size=20))
+          axis.text.y= element_text(size=20),
+          plot.margin=unit(c(2,1,1,1),"cm")) 
   
   setwd(paste(baseWD, "post_processing", "figures", sep="/"))
   ggsave(paste0("profitscatter",".png"), dpi=500,width=12, height=6)
@@ -1145,8 +1213,11 @@ profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitiv
   melted <- finaldf[,c("label","profit","storageprofit")]
   colnames(melted) <- c("label","Wind","ESR")
   
-  melted$cat <- c("Case A: ESR Only","Case A: ESR Only","Case B: ESR+Wind","Case B: ESR+Wind")
-  #melted$cat <- c("Case B: RT Perfect Foresight","Case B: RT Perfect Foresight","Case B: RT Uncertainty","Case B: RT Uncertainty")
+  melted$cat <- c("ESR+Wind Co-located","ESR+Wind Co-located",
+                  "ESR+Wind Hybrid","ESR+Wind Hybrid")
+  
+  #melted$cat <- c("Case A: ESR Only","Case A: ESR Only","Case B: ESR+Wind","Case B: ESR+Wind")
+  melted$cat <- c("Case B: RT Perfect Foresight","Case B: RT Perfect Foresight","Case B: RT Uncertainty","Case B: RT Uncertainty")
   
   melted <- melt(melted, id.vars=c("label","cat"))
   melted$label <- ifelse(melted$label=="Competitive","Competitive","Strategic ESR Bids")
@@ -1175,10 +1246,10 @@ profitResultsPairs <- function(pairlist, dates, labels=c("Strategic","Competitiv
           axis.title.x = element_text(size=24),
           axis.text.x= element_text(size=16),
           axis.text.y= element_text(size=20),
-          strip.text.x = element_text(size=24))
+          strip.text.x = element_text(size=20))
   
   setwd(paste(baseWD, "post_processing", "figures", sep="/"))
-  ggsave(paste0("profitstackbar",".png"), dpi=500,width=10, height=6)
+  ggsave(paste0(barTitle,"profitstackbar",".png"), dpi=500,width=10, height=6)
   
   return(finaldf)
 
@@ -1191,7 +1262,7 @@ a<-LoadWindScatter(resultsD,list(resultsC,resultsC,resultsF))
 e<-LoadWindScatter(resultsA,resultsB)
 
 dates1 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=31) # Configure cases period here
-dates2 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=59)
+dates2 <- seq(as.POSIXct("1/1/2019", format = "%m/%d/%Y"), by="day", length.out=15)
 dates3 <- seq(as.POSIXct("1/15/2019", format = "%m/%d/%Y"), by="day", length.out=5)
 resultsDispatch <- loadResults(dates3,folder='NoStorageDispatch',subfolder="results_DA")
 disp<-plotDispatch(resultsDispatch,dates3,plotTitle='JanFeb 2019 dispatch')
@@ -1216,6 +1287,10 @@ resultsSS50_50 <-loadResults(dates1,folder='303SS_Wind303_50_50',subfolder="resu
 resultsNSS50_50 <- loadResults(dates1,folder='303NSS_Wind303_50_50',subfolder="results_DA")
 resultsSS100_100 <-loadResults(dates1,folder='303SS_Wind303_100_100',subfolder="results_DA")
 resultsNSS100_100 <- loadResults(dates1,folder='303NSS_Wind303_100_100',subfolder="results_DA")
+resultsSS200_200 <-loadResults(dates1,folder='303SS_Wind303_200_200',subfolder="results_DA")
+resultsNSS200_200 <- loadResults(dates1,folder='303NSS_Wind303_200_200',subfolder="results_DA")
+
+
 
 #resultsSS300_300 <-loadResults(dates1,folder='303SS_Wind303_300_300',subfolder="results_DA")
 #resultsNSS300_300 <- loadResults(dates1,folder='303NSS_Wind303_300_300',subfolder="results_DA")
@@ -1230,15 +1305,28 @@ profitResultsPairs(list(list(resultsSS50_150,resultsNSS50_150),
                         list(resultsSS300_900,resultsNSS300_900),
                         list(resultsSS500_1500,resultsNSS500_1500),
                         list(resultsSS50_50,resultsNSS50_50),
-                        list(resultsSS100_100,resultsNSS100_100)),dates1)
+                        list(resultsSS100_100,resultsNSS100_100),
+                        list(resultsSS200_200,resultsNSS200_200)),dates1)
 # end profit scatter
 #checker 
-clist <- list(cleanDispatchProfit(resultsNSS100_100,dates1),
-              cleanDispatchProfit(resultsSS100_100,dates1))
-names(clist) <- c("NSS","SS")
+resultsWINDSS300_900 <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
+resultsWINDSS300_900_RTVRE <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA_RTVRE")
+clist <- list(cleanDispatchProfit(resultsWINDSS300_900,dates1),
+              cleanDispatchProfit(resultsWINDSS300_900_RTVRE,dates1))
+names(clist) <- c("DA","RT")#c("SS","hybrid")
 totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
 
 #end checker
+
+#Hybrid plotter
+resultsWINDSS300_900 <-loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_DA")
+resultsHYRID_300_900 <- loadResults(dates1,folder="303SS_HYBRID_300_900",subfolder="results_DA")
+
+
+profitResultsPairs(list(list(resultsSS300_900,resultsNSS300_900),
+                        list(resultsHYRID_300_900,resultsNSS300_900)),
+                   dates1)
+
 
 resultsSS300_900_DABIND <- loadResults(dates1,folder='303SS_Wind303_300_900',subfolder="results_Bind_DA")
 resultsNSS300_900_RTVRE <- loadResults(dates1,folder='303NSS_Wind303_300_900',subfolder="results_DA_RTVRE")
@@ -1259,7 +1347,7 @@ totalprofit <- compareGeneratorProfit(clist,plotTitle=" ",resolution="")
 
 profitResultsPairs(list(list(resultsSS300_900_RTVRE,resultsNSS300_900_RTVRE),
                         list(resultsSS300_900_DABIND,resultsNSS300_900_RTVRE)),
-                    dates1)
+                   barTitle = "RTVRE",dates1)
 
 
 mean(resultsSS300_900$nucoffer$capacity[grepl("303_WIND",resultsSS300_900$nucoffer$X)]) #calculates wind avg gen
@@ -1303,3 +1391,26 @@ NSS <- plotStorage(resultsNSS300_900,plotTitle="NSS")
 NSS <- NSS %>% group_by(X,hour,date) %>% summarise(profit=sum(profit))
 sum(NSS$profit[NSS$profit>0])
 sum(NSS$profit[NSS$profit<0])
+
+
+###offer comparisons
+
+
+#cases
+datesOffer <- seq(as.POSIXct("1/15/2019", format = "%m/%d/%Y"), by="day", length.out=3)
+OFFERresultsSS300_900 <-loadResults(datesOffer,folder='303SS_300_900',subfolder="results_DA")
+OFFERresultsWINDSS300_900 <-loadResults(datesOffer,folder='303SS_Wind303_300_900',subfolder="results_DA")
+#OFFERresultsWINDSS300_900_UNIFORM <- loadResults(datesOffer,folder="303SS_Wind303_300_900_uniformoffer",subfolder = "results_DA")
+OFFERresultsNSS300_900 <- loadResults(datesOffer,folder="303NSS_Wind303_300_900",subfolder = "results_DA")
+
+storelist <- list(plotStorage(OFFERresultsSS300_900,datesOffer,plotTitle="A"),
+                  plotStorage(OFFERresultsWINDSS300_900,datesOffer,plotTitle="B"),
+                  plotStorage(OFFERresultsNSS300_900,datesOffer,plotTitle="C"))
+names(storelist) <- c('ESROnly','ESR+Wind',"Competitive")
+
+genlist <- list(cleanDispatchProfit(OFFERresultsSS300_900,datesOffer,overwrite_gen="303_WIND_1",returntype = "offer"),
+                cleanDispatchProfit(OFFERresultsWINDSS300_900,datesOffer,returntype = "offer"),
+                cleanDispatchProfit(OFFERresultsNSS300_900,datesOffer,returntype="offer"))
+names(genlist) <- c("WindESROnly","WindESR+Wind","Competitive")
+compareStorageOffer(storelist,genlist,"Competitive",plotTitle="charge")
+

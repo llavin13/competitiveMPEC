@@ -1,0 +1,126 @@
+RT is False
+Default write of storage_offers_DA.csv just to have a file (but constraint should be inactive)
+Reading model...
+...model read.
+creating competitive generators file...
+...competitive generators recorded.
+Loading data...
+.. day-ahead data with real-time VRE data read.
+Compiling instance...
+...instance created.
+Creating Offer Mitigation (model will solve as dispatch if TRUE)...
+NOTE: storage offers will not be mitigated
+...storage offer mitigation file created
+Converting model to MPEC...
+...converted
+MIP
+NOTE: initial MIP solve with only storage competitive to get feasible solution
+Solving...
+
+Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer 12.9.0.0
+  with Simplex, Mixed Integer & Barrier Optimizers
+5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21
+Copyright IBM Corp. 1988, 2019.  All Rights Reserved.
+
+Type 'help' for a list of available commands.
+Type 'help' followed by a command name for more
+information on commands.
+
+CPLEX> Logfile 'cplex.log' closed.
+Logfile 'C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmpt_75g0yw.cplex.log' open.
+CPLEX> New value for parallel optimization mode: -1
+CPLEX> New value for mixed integer optimality gap tolerance: 0.01
+CPLEX> New value for feasibility tolerance: 0.0001
+CPLEX> New value for deterministic time limit in ticks: 250000
+CPLEX> Problem 'C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmp0z_0ajfb.pyomo.lp' read.
+Read time = 0.19 sec. (13.83 ticks)
+CPLEX> Problem name         : C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmp0z_0ajfb.pyomo.lp
+Objective sense      : Maximize
+Variables            :   53321  [Nneg: 889,  Box: 21854,  Free: 3480,
+                                 Binary: 27098]
+Objective nonzeros   :    8956
+Linear constraints   :  122140  [Less: 40959,  Greater: 58612,  Equal: 22569]
+  Nonzeros           :  288457
+  RHS nonzeros       :   66982
+
+Variables            : Min LB: -5000.000        Max UB: 5000.000       
+Objective nonzeros   : Min   : 0.07500000       Max   : 731.8583       
+Linear constraints   :
+  Nonzeros           : Min   : 0.07500000       Max   : 2910000.       
+  RHS nonzeros       : Min   : 0.07500000       Max   : 3000000.       
+CPLEX> CPXPARAM_Parallel                                -1
+CPXPARAM_Simplex_Tolerances_Feasibility          0.0001
+CPXPARAM_DetTimeLimit                            250000
+CPXPARAM_MIP_Tolerances_MIPGap                   0.01
+Tried aggregator 3 times.
+MIP Presolve eliminated 88096 rows and 18952 columns.
+MIP Presolve added 3371 rows and 0 columns.
+MIP Presolve modified 24520 coefficients.
+Aggregator did 12831 substitutions.
+Reduced MIP has 24584 rows, 20982 columns, and 68872 nonzeros.
+Reduced MIP has 8287 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.23 sec. (169.86 ticks)
+Probing fixed 430 vars, tightened 6118 bounds.
+Probing time = 0.05 sec. (21.16 ticks)
+Tried aggregator 2 times.
+MIP Presolve eliminated 962 rows and 867 columns.
+MIP Presolve modified 3004 coefficients.
+Aggregator did 46 substitutions.
+Reduced MIP has 23576 rows, 20069 columns, and 65928 nonzeros.
+Reduced MIP has 7855 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.11 sec. (86.49 ticks)
+Probing fixed 0 vars, tightened 217 bounds.
+Probing time = 0.08 sec. (21.50 ticks)
+Clique table members: 39507.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: opportunistic, using up to 24 threads.
+Root relaxation solution time = 0.41 sec. (647.04 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     0    59902.9151   160                  59902.9151     6368         
+      0     0    59876.4597   124                   Cuts: 236     6482         
+      0     0    59876.1194   108                    Cuts: 66     6517         
+      0     0    59875.7436   100                    Cuts: 48     6536         
+      0     0    59875.7346    89                    Cuts: 43     6548         
+      0     0    59875.7165    84                Flowcuts: 40     6555         
+      0     0    59875.6805    77                Flowcuts: 40     6562         
+      0     0    59875.6625    76                 Flowcuts: 4     6563         
+      0     0    59875.6495    77                 Flowcuts: 1     6565         
+      0     2    59875.6495    77                     Cuts: 3     6565         
+Elapsed time = 5.53 sec. (3601.05 ticks, tree = 0.02 MB, solutions = 0)
+    350    75    59583.4663    45                  59866.4435     7024         
+    708   203    59537.6222    37                  59866.4435     8761         
+   1148   595    59371.0181    31                  59866.4435    11637         
+   1632  1188    50722.5929    24                  59866.4435    17862         
+   2099  1588    59823.5478    30                  59866.4435    22822         
+   2491  1772    58781.8310    36                  59866.4435    24904         
+*  2529  1864      integral     0    59277.0222    59866.4435    25376    0.99%
+*  2620  1722      integral     0    59495.6536    59866.4435    24606    0.62%
+
+Clique cuts applied:  25
+Cover cuts applied:  1
+Flow cuts applied:  89
+Mixed integer rounding cuts applied:  1
+Gomory fractional cuts applied:  13
+
+Root node processing (before b&c):
+  Real time             =    4.88 sec. (3540.74 ticks)
+Parallel b&c, 24 threads:
+  Real time             =    4.75 sec. (1826.81 ticks)
+  Sync time (average)   =    0.24 sec.
+  Wait time (average)   =    0.00 sec.
+                          ------------
+Total (root+branch&cut) =    9.63 sec. (5367.55 ticks)
+
+Solution pool: 4 solutions saved.
+
+MIP - Integer optimal, tolerance (0.01/1e-06):  Objective =  5.9495653599e+04
+Current MIP best bound =  5.9866443498e+04 (gap = 370.79, 0.62%)
+Solution time =    9.64 sec.  Iterations = 29535  Nodes = 2658 (972)
+Deterministic time = 5367.70 ticks  (556.82 ticks/sec)
+
+CPLEX> Incumbent solution written to file 'C:\Users\Luke\Desktop\competitiveMPEC_1.16\logs\tmpllbou9jq.cplex.sol'.
+CPLEX> Exporting results... 
