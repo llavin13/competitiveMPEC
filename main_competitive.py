@@ -38,10 +38,10 @@ start_time = time.time()
 cwd = os.path.join(os.environ["HOMEPATH"], "Desktop", "competitiveMPEC_dev1.27")
 
 ### GENERAL INPUTS ###
-case_folder = "303SS_Wind303_200_200"  # "Colocated303_303NSS"  #Wind303_2x303NSS
+case_folder = "303SS_Wind303_500_500"  # "Colocated303_303NSS"  #Wind303_2x303NSS
 
 # start from 7/1
-start_date = "01-30-2019"  # use this string format
+start_date = "01-01-2019"  # use this string format
 end_date = "02-01-2019"  # end date is exclusive
 MPEC = True  # if you wish to run as MPEC, if false runs as min cost dispatch LP
 RT, rt_tmps, total_rt_tmps = False, 48, 288
