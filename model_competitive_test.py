@@ -656,15 +656,15 @@ dispatch_model.go = Var(
 )
 
 dispatch_model.sodischarge = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=NonNegativeReals,
+    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=Reals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(-50, 5000),
 )
 
 dispatch_model.socharge = Var(
-    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=NonNegativeReals,
+    dispatch_model.ACTIVETIMEPOINTS, dispatch_model.STORAGE, within=Reals,
     initialize=0,
-    bounds=(0, 5000),
+    bounds=(-50, 5000),
 )
 
 
